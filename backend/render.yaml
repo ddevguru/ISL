@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: sign-detection-api
+    runtime: python
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt && python init_db.py
+    startCommand: gunicorn -w 4 -b 0.0.0.0:$PORT 'app:create_app()'
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_APP
+        value: app.py
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sign-detection-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: sign-detection-cache
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+
+  - type: pserv
+    name: sign-detection-db
+    ipAllowList: []
+    plan: free
+    postgresVersion: 15
+
+  - type: redis
+    name: sign-detection-cache
+    ipAllowList: []
+    plan: free
+    maxmemoryPolicy: allkeys-lru

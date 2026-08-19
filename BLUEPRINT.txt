@@ -1,0 +1,201 @@
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                  SIGN DETECTION - DEPLOYMENT BLUEPRINT                                  ║
+║                        (Live Camera Detection System)                                   ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                           🌐 RENDER CLOUD (Production)                                  │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                         │
+│  ┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────────────┐        │
+│  │  Web Service (API)   │   │  PostgreSQL DB       │   │  Redis Cache         │        │
+│  ├──────────────────────┤   ├──────────────────────┤   ├──────────────────────┤        │
+│  │ Port: 10000          │   │ sign_detection db    │   │ Cache layer          │        │
+│  │ Gunicorn (4 workers) │   │ User data            │   │ Session storage      │        │
+│  │ Flask App            │   │ Detection history    │   │ Model caching        │        │
+│  │ Upload folder        │   │ Replicas: PostgreSQL│   │ Message queue        │        │
+│  │ Model cache          │   │                      │   │                      │        │
+│  └──────────┬───────────┘   └──────────┬───────────┘   └──────────┬───────────┘        │
+│             │                          │                          │                    │
+│             └──────────────────────────┼──────────────────────────┘                    │
+│                                        ▼                                               │
+│                   ┌─────────────────────────────────────┐                             │
+│                   │  API Endpoint (HTTPS)               │                             │
+│                   │ https://sign-detection-api-xxxxx    │                             │
+│                   │      .onrender.com                  │                             │
+│                   └──────────────┬──────────────────────┘                             │
+└─────────────────────────────────┼─────────────────────────────────────────────────────┘
+                                   │
+                    ┌──────────────┼──────────────┐
+                    │              │              │
+              INTERNET / WiFi / LTE
+                    │              │              │
+           ┌────────▼────────┐    ┌─┴──────────────────────────────────┐
+           │                 │    │                                    │
+      ┌────▼──────────────────┴────┴─┐                                │
+      │  📱 FLUTTER APP              │                                │
+      │ (Android/iOS Devices)        │                                │
+      ├──────────────────────────────┤                                │
+      │ ✅ Live Camera               │                                │
+      │ ✅ Real-time Detection       │                                │
+      │ ✅ Frame Capture & Send      │                                │
+      │ ✅ Result Display            │                                │
+      │ ✅ Detection History         │                                │
+      │ ✅ Audio Translation          │                                │
+      │                              │                                │
+      │ ApiConfig (Dynamic):         │                                │
+      │ • Local: 192.168.x.x:5000   │                                │
+      │ • Remote: render.com        │                                │
+      └──────────────────────────────┘                                │
+                                                                       │
+                      (OR for local development)                       │
+                                                                       │
+              ┌──────────────────────────────────────────┐             │
+              │  💻 LOCAL MACHINE (Development)          │             │
+              ├──────────────────────────────────────────┤             │
+              │                                          │             │
+              │  ┌────────────────┐  ┌────────────────┐ │             │
+              │  │ Backend (Flask)│  │ PostgreSQL DB  │ │             │
+              │  ├────────────────┤  ├────────────────┤ │             │
+              │  │ Port: 5000     │  │ localhost:5432 │ │             │
+              │  │ http://0.0.0.0 │  │ sign_detection │ │             │
+              │  └────────────────┘  └────────────────┘ │             │
+              │                                          │             │
+              │  ┌────────────────┐  ┌────────────────┐ │             │
+              │  │ Redis Cache    │  │ File Storage   │ │             │
+              │  ├────────────────┤  ├────────────────┤ │             │
+              │  │ Port: 6379     │  │ ./uploads      │ │             │
+              │  │ localhost      │  │ ./models       │ │             │
+              │  └────────────────┘  └────────────────┘ │             │
+              │                                          │             │
+              └──────────────────────────────────────────┘             │
+                                                                       │
+              Connected via: http://192.168.0.146:5000                │
+                           (or your local machine IP)                 │
+                                                                       │
+┌──────────────────────────────────────────────────────────────────────┴──────────────┐
+│                         📊 DATA FLOW                                                 │
+├────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                     │
+│  1. User launches app → Camera initialized                                        │
+│  2. Camera captures frames                                                        │
+│  3. Frame converted to base64                                                     │
+│  4. Sent to /api/detection/detect-frame endpoint                                 │
+│  5. Backend processes with MediaPipe + ML model                                  │
+│  6. Returns detected sign + confidence score                                      │
+│  7. Result displayed in real-time on screen                                      │
+│  8. History stored in database                                                    │
+│                                                                                     │
+└────────────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                        ✅ WHAT'S BEEN SET UP FOR YOU                                  ║
+╠════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                        ║
+║ 🎯 Backend Deployment                                                                ║
+║   ✅ render.yaml - One-click blueprint for Render                                    ║
+║   ✅ requirements.txt - All Python dependencies                                      ║
+║   ✅ .env.example - Environment template                                            ║
+║   ✅ Pre-configured for PostgreSQL + Redis                                          ║
+║                                                                                        ║
+║ 📱 Flutter App                                                                       ║
+║   ✅ Updated ApiConfig with dynamic URL switching                                   ║
+║   ✅ LiveSignDetectionScreen with camera integration                               ║
+║   ✅ Support for local network and production URLs                                 ║
+║   ✅ Real-time frame processing and detection                                      ║
+║                                                                                        ║
+║ 🛠️ Setup Tools                                                                       ║
+║   ✅ SETUP.sh (Linux/Mac) - Automated setup script                                  ║
+║   ✅ SETUP.bat (Windows) - Automated setup script                                   ║
+║   ✅ DEPLOYMENT_SUMMARY.md - Quick reference guide                                 ║
+║   ✅ Complete Deployment Guide (Artifact) - Detailed instructions                  ║
+║                                                                                        ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                           🚀 THREE STEPS TO LAUNCH                                    ║
+╠════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                        ║
+║ STEP 1: DEPLOY BACKEND (5 minutes)                                                   ║
+║ ─────────────────────────────────                                                    ║
+║ • Go to render.com and create account                                              ║
+║ • Upload render.yaml blueprint                                                    ║
+║ • Render creates: PostgreSQL + Redis + Web Service automatically                 ║
+║ • Get backend URL: https://sign-detection-api-xxxxx.onrender.com                 ║
+║                                                                                        ║
+║ STEP 2: UPDATE FLUTTER APP (2 minutes)                                              ║
+║ ──────────────────────────────────────                                              ║
+║ • In lib/main.dart, add:                                                           ║
+║   ApiConfig.useProduction('sign-detection-api-xxxxx.onrender.com');               ║
+║ • Add camera plugin to pubspec.yaml                                               ║
+║ • Run: flutter pub get                                                            ║
+║                                                                                        ║
+║ STEP 3: TEST & DEPLOY (varies)                                                      ║
+║ ────────────────────────────                                                        ║
+║ • Test locally: flutter run (using local backend)                                 ║
+║ • Build APK: flutter build apk                                                    ║
+║ • Build iOS: flutter build ios                                                    ║
+║ • Install on device and test live detection!                                      ║
+║                                                                                        ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                       📋 FILE CHECKLIST & LOCATIONS                                   ║
+╠════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                        ║
+║ Backend Files                                                                         ║
+║ ─────────────                                                                         ║
+║ ✅ backend/render.yaml                    - Deployment blueprint                    ║
+║ ✅ backend/requirements.txt                - Python dependencies                    ║
+║ ✅ backend/.env.example                   - Environment template                   ║
+║ ✅ backend/app.py                         - Flask app (existing)                   ║
+║                                                                                        ║
+║ Flutter Files                                                                         ║
+║ ───────────────                                                                       ║
+║ ✅ sign_detection/lib/config/api_config.dart              - Updated API config      ║
+║ ✅ sign_detection/lib/features/live_detection/           - New camera screen       ║
+║    live_sign_detection_screen.dart                                                  ║
+║ ✅ sign_detection/pubspec.yaml                           - (add camera package)    ║
+║                                                                                        ║
+║ Documentation                                                                         ║
+║ ───────────────                                                                       ║
+║ ✅ DEPLOYMENT_SUMMARY.md                  - Quick start guide                      ║
+║ ✅ Complete Deployment Guide (Artifact)   - Detailed instructions                 ║
+║ ✅ BLUEPRINT.txt (this file)              - Architecture overview                 ║
+║ ✅ SETUP.sh / SETUP.bat                   - Automated setup                       ║
+║                                                                                        ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                         🔗 RENDER.YAML BLUEPRINT DETAILS                              ║
+╠════════════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                        ║
+║ This blueprint automatically creates on Render:                                      ║
+║                                                                                        ║
+║ Web Service                                                                           ║
+║ ───────────                                                                           ║
+║ • Name: sign-detection-api                                                          ║
+║ • Runtime: Python 3.11                                                              ║
+║ • Build: pip install -r requirements.txt && python init_db.py                      ║
+║ • Start: gunicorn -w 4 -b 0.0.0.0:$PORT 'app:create_app()'                        ║
+║ • Plan: Free/Starter                                                                ║
+║                                                                                        ║
+║ PostgreSQL Database                                                                  ║
+║ ──────────────────────                                                               ║
+║ • Name: sign-detection-db                                                           ║
+║ • Version: 15                                                                        ║
+║ • Plan: Free/Starter                                                                ║
+║ • Auto-connects to web service via DATABASE_URL                                     ║
+║                                                                                        ║
+║ Redis Cache                                                                           ║
+║ ──────────────                                                                        ║
+║ • Name: sign-detection-cache                                                        ║
+║ • Plan: Free                                                                         ║
+║ • Policy: allkeys-lru (automatic cleanup)                                           ║
+║ • Auto-connects via REDIS_URL                                                       ║
+║                                                                                        ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+
+                         👉 START WITH THE COMPLETE GUIDE 👈
+                 Read the artifact: "Sign Detection - Complete Deployment Guide"
+                              (It has everything explained step-by-step)
