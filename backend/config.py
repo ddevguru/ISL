@@ -1,6 +1,30 @@
 import os
 from datetime import timedelta
 
+def _get_production_db_url():
+    """Get production database URL with SSL configuration for Render"""
+    db_url = os.getenv('DATABASE_URL', '')
+
+    if not db_url:
+        return 'sqlite:///sign_detection.db'
+
+    # Fix URL scheme
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    elif db_url.startswith('rediss://'):
+        db_url = db_url.replace('rediss://', 'postgresql://', 1)
+
+    # Remove existing SSL params
+    if '?' in db_url:
+        db_url = db_url.split('?')[0]
+
+    # Add lenient SSL mode
+    if db_url.startswith('postgresql://'):
+        db_url += '?sslmode=allow'
+
+    return db_url
+
+
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
@@ -9,9 +33,7 @@ class Config:
         'sqlite:///sign_detection.db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # Disable query echo except in debug
     SQLALCHEMY_ECHO = False
-    # Use connection pooling
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_size': 10,
         'pool_recycle': 3600,
@@ -36,33 +58,12 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    # Use SQLite for local development
     SQLALCHEMY_DATABASE_URI = 'sqlite:///sign_detection.db'
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Use PostgreSQL for production - Render provides DATABASE_URL with proper SSL
-    db_url = os.getenv('DATABASE_URL', '')
-
-    # Fix: Render's PostgreSQL URL might have rediss:// or needs SSL params
-    if db_url.startswith('postgres://'):
-        db_url = db_url.replace('postgres://', 'postgresql://', 1)
-
-    if db_url.startswith('rediss://'):
-        db_url = db_url.replace('rediss://', 'postgresql://', 1)
-
-    # Remove existing SSL params and add lenient SSL mode
-    if '?' in db_url:
-        db_url = db_url.split('?')[0]
-
-    # Use sslmode=allow to bypass certificate verification issues
-    if db_url.startswith('postgresql://'):
-        db_url += '?sslmode=allow'
-
-    SQLALCHEMY_DATABASE_URI = db_url if db_url else 'sqlite:///sign_detection.db'
-
-    # Connection pool settings for Render
+    SQLALCHEMY_DATABASE_URI = _get_production_db_url()
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_size': 5,
         'pool_recycle': 1800,
