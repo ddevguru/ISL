@@ -4,6 +4,7 @@ from flask_cors import CORS
 from config import config
 import os
 from pathlib import Path
+from sqlalchemy import text
 
 from models import db
 from auth import auth_bp
@@ -60,7 +61,7 @@ def create_app(config_name='development'):
     @app.route('/health', methods=['GET'])
     def health_check():
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             return jsonify({
                 'status': 'healthy',
                 'database': 'connected'
