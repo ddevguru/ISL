@@ -1,6 +1,13 @@
 import os
 from datetime import timedelta
 
+def _get_database_url(default_url='postgresql://postgres:password@localhost:5432/sign_detection'):
+    """Get database URL with proper SSL handling for Render PostgreSQL"""
+    db_url = os.getenv('DATABASE_URL', default_url)
+    if db_url and db_url.startswith('postgresql://') and '?sslmode=' not in db_url:
+        db_url += '?sslmode=require'
+    return db_url
+
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
@@ -34,11 +41,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Use PostgreSQL for production
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        'postgresql://postgres:password@localhost:5432/sign_detection'
-    )
+    # Use PostgreSQL for production with SSL
+    SQLALCHEMY_DATABASE_URI = _get_database_url()
 
 
 class TestingConfig(Config):
