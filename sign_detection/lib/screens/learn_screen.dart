@@ -14,18 +14,11 @@ class LearnScreen extends StatefulWidget {
 
 class _LearnScreenState extends State<LearnScreen> {
   String selectedLanguage = 'en';
-  String selectedDifficulty = 'Easy';
   String selectedCategory = 'Greetings';
   List<Map<String, dynamic>> signs = [];
+  List<String> categories = ['Greetings', 'Common Words', 'Places', 'Adjectives', 'Verbs', 'Emotions', 'People'];
   Map<String, dynamic> learningStats = {};
   bool isLoading = false;
-  int currentSignIndex = 0;
-
-  final translations = {
-    'en': {'title': 'Learn ISL', 'practiced': 'Practiced', 'accuracy': 'Accuracy', 'master': 'Master it!'},
-    'hi': {'title': 'ISL सीखें', 'practiced': 'प्रशिक्षित', 'accuracy': 'सटीकता', 'master': 'इसे मास्टर करें!'},
-    'mr': {'title': 'ISL शिका', 'practiced': 'सराव केले', 'accuracy': 'अचूकता', 'master': 'महारत मिळवा!'},
-  };
 
   @override
   void initState() {
@@ -40,7 +33,7 @@ class _LearnScreenState extends State<LearnScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/learning/signs?difficulty=$selectedDifficulty&category=$selectedCategory'),
+        Uri.parse('${ApiConfig.baseUrl}/learning/signs'),
         headers: {
           ...ApiConfig.defaultHeaders,
           'Authorization': 'Bearer ${authService.accessToken}',
@@ -51,7 +44,8 @@ class _LearnScreenState extends State<LearnScreen> {
         final data = jsonDecode(response.body);
         final signsList = data['signs'] as List?;
         if (signsList != null) {
-          setState(() => signs = List<Map<String, dynamic>>.from(signsList));
+          final filtered = signsList.where((s) => s['category'] == selectedCategory).toList();
+          setState(() => signs = List<Map<String, dynamic>>.from(filtered));
         }
       }
     } catch (e) {
@@ -63,7 +57,6 @@ class _LearnScreenState extends State<LearnScreen> {
 
   Future<void> _loadProgress() async {
     final authService = context.read<AuthService>();
-
     try {
       final response = await http.get(
         Uri.parse('${ApiConfig.baseUrl}/learning/progress'),
@@ -84,7 +77,6 @@ class _LearnScreenState extends State<LearnScreen> {
 
   Future<void> _recordPractice(String signId, bool correct) async {
     final authService = context.read<AuthService>();
-
     try {
       await http.post(
         Uri.parse('${ApiConfig.baseUrl}/learning/progress/$signId'),
@@ -94,121 +86,74 @@ class _LearnScreenState extends State<LearnScreen> {
         },
         body: jsonEncode({'correct': correct}),
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(correct ? 'Great! Correct!' : 'Keep practicing!'),
-          backgroundColor: correct ? Colors.green : Colors.orange,
-        ),
-      );
-
       _loadProgress();
     } catch (e) {
       print('Error recording practice: $e');
     }
   }
 
-  String _getTranslation(String key) {
-    return translations[selectedLanguage]?[key] ?? key;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_getTranslation('title')),
+        title: const Text('ISL Dictionary'),
         backgroundColor: Colors.deepPurple,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (lang) => setState(() => selectedLanguage = lang),
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'en', child: Text('English')),
-              PopupMenuItem(value: 'hi', child: Text('हिंदी')),
-              PopupMenuItem(value: 'mr', child: Text('मराठी')),
-            ],
-          ),
-        ],
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Stats Card
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.deepPurple.shade400, Colors.deepPurple.shade700],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Your Progress',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatCard('${learningStats['total_signs_practiced'] ?? 0}', 'Signs Learned'),
-                      _buildStatCard('${learningStats['mastered_signs'] ?? 0}', 'Mastered'),
-                      _buildStatCard('${learningStats['total_practice_sessions'] ?? 0}', 'Sessions'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Filters
+            // Search bar
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Difficulty', style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: ['Easy', 'Medium', 'Hard'].map((d) {
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() {
-                            selectedDifficulty = d;
-                            _loadSigns();
-                          }),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: selectedDifficulty == d
-                                  ? Colors.deepPurple
-                                  : Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              d,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: selectedDifficulty == d
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search signs...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                ),
               ),
             ),
 
-            // Signs List
+            // Category buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: categories.map((cat) {
+                    final isSelected = selectedCategory == cat;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ElevatedButton(
+                        onPressed: () => setState(() {
+                          selectedCategory = cat;
+                          _loadSigns();
+                        }),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSelected ? Colors.deepPurple : Colors.white,
+                          side: BorderSide(
+                            color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Signs grid
             if (isLoading)
               const Padding(
                 padding: EdgeInsets.all(40),
@@ -217,77 +162,69 @@ class _LearnScreenState extends State<LearnScreen> {
             else if (signs.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: ListView.builder(
+                child: GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                  ),
                   itemCount: signs.length,
                   itemBuilder: (context, index) {
                     final sign = signs[index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.deepPurple.shade200),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            sign['name'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                Text(
+                                  sign['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepPurple,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  selectedLanguage == 'hi'
+                                      ? (sign['hindi_translation'] ?? '')
+                                      : (sign['english_translation'] ?? ''),
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
-                          if (selectedLanguage == 'hi')
-                            Text(
-                              sign['hindi_translation'] ?? '',
-                              style: const TextStyle(fontSize: 16),
-                            )
-                          else if (selectedLanguage == 'mr')
-                            Text(
-                              sign['english_translation'] ?? '',
-                              style: const TextStyle(fontSize: 16),
-                            )
-                          else
-                            Text(
-                              sign['english_translation'] ?? '',
-                              style: const TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          const SizedBox(height: 12),
-                          Text(
-                            sign['description'] ?? '',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _recordPractice(sign['id'], true),
-                                  icon: const Icon(Icons.check),
-                                  label: const Text('Got it!'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                  ),
-                                ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple.shade100,
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _recordPractice(sign['id'], false),
-                                  icon: const Icon(Icons.repeat),
-                                  label: const Text('Practice more'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                  ),
-                                ),
+                            ),
+                            child: Text(
+                              sign['category'] ?? '',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.deepPurple,
+                                fontWeight: FontWeight.w500,
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
@@ -298,32 +235,11 @@ class _LearnScreenState extends State<LearnScreen> {
             else
               Padding(
                 padding: const EdgeInsets.all(40),
-                child: Center(
-                  child: Text('No signs available for this level'),
-                ),
+                child: Text('No signs in this category'),
               ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStatCard(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-        ),
-      ],
     );
   }
 }
