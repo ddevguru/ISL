@@ -1,3 +1,6 @@
+# Training-only dependencies (not needed on Render)
+# Run locally: pip install -r requirements-train.txt
+
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
 Flask-JWT-Extended==4.5.2
@@ -5,7 +8,6 @@ Flask-CORS==4.0.0
 python-dotenv==1.0.0
 psycopg2-binary==2.9.7
 opencv-python==4.8.0.76
-numpy==1.26.4
 Pillow==10.0.0
 requests==2.31.0
 pydantic==2.0.0
@@ -14,3 +16,10 @@ werkzeug==2.3.0
 gunicorn==21.2.0
 redis==5.0.0
 celery==5.3.0
+
+numpy==1.26.4
+tensorflow==2.18.1
+keras==3.5.0
+scikit-learn==1.5.1
+pandas==2.2.3
+mediapipe==0.10.35

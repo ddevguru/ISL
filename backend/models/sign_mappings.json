@@ -1,0 +1,82 @@
+{
+  "Hello": {
+    "english": "Hello",
+    "hindi": "नमस्ते"
+  },
+  "Thank You": {
+    "english": "Thank You",
+    "hindi": "धन्यवाद"
+  },
+  "Yes": {
+    "english": "Yes",
+    "hindi": "हाँ"
+  },
+  "No": {
+    "english": "No",
+    "hindi": "नहीं"
+  },
+  "Water": {
+    "english": "Water",
+    "hindi": "पानी"
+  },
+  "Food": {
+    "english": "Food",
+    "hindi": "खाना"
+  },
+  "Good": {
+    "english": "Good",
+    "hindi": "अच्छा"
+  },
+  "Bad": {
+    "english": "Bad",
+    "hindi": "बुरा"
+  },
+  "Help": {
+    "english": "Help",
+    "hindi": "मदद"
+  },
+  "Please": {
+    "english": "Please",
+    "hindi": "कृपया"
+  },
+  "Goodbye": {
+    "english": "Goodbye",
+    "hindi": "अलविदा"
+  },
+  "Sorry": {
+    "english": "Sorry",
+    "hindi": "माफी"
+  },
+  "Love": {
+    "english": "Love",
+    "hindi": "प्यार"
+  },
+  "Happy": {
+    "english": "Happy",
+    "hindi": "खुश"
+  },
+  "Sad": {
+    "english": "Sad",
+    "hindi": "दुःख"
+  },
+  "Walk": {
+    "english": "Walk",
+    "hindi": "चलना"
+  },
+  "Sit": {
+    "english": "Sit",
+    "hindi": "बैठना"
+  },
+  "Sleep": {
+    "english": "Sleep",
+    "hindi": "सोना"
+  },
+  "Eat": {
+    "english": "Eat",
+    "hindi": "खाना"
+  },
+  "Drink": {
+    "english": "Drink",
+    "hindi": "पीना"
+  }
+}

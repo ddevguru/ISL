@@ -23,13 +23,19 @@ class SignDetector:
 
     def _load_model_and_labels(self, model_path):
         try:
+            # Try to load TensorFlow model if available
             if model_path and os.path.exists(model_path):
-                from tensorflow.keras.models import load_model
-                model_file = os.path.join(model_path, 'sign_model.h5')
-                if os.path.exists(model_file):
-                    self.model = load_model(model_file)
-                    print(f"✓ Model loaded from {model_file}")
+                try:
+                    from tensorflow.keras.models import load_model
+                    model_file = os.path.join(model_path, 'sign_model.h5')
+                    if os.path.exists(model_file):
+                        self.model = load_model(model_file)
+                        print(f"✓ Model loaded from {model_file}")
+                except ImportError:
+                    print("⚠ TensorFlow not available - using translation service only")
+                    self.model = None
 
+            # Load sign translations (always required)
             labels_file = os.path.join(model_path or 'models', 'sign_labels.json') if model_path else 'models/sign_labels.json'
             if os.path.exists(labels_file):
                 with open(labels_file, 'r', encoding='utf-8') as f:
@@ -37,6 +43,7 @@ class SignDetector:
                     print(f"✓ Loaded {len(self.sign_to_translation)} sign translations")
             else:
                 self.sign_to_translation = self._get_default_labels()
+                print(f"✓ Using default {len(self.sign_to_translation)} sign translations")
 
         except Exception as e:
             print(f"Warning: Could not load model files: {e}")
