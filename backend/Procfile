@@ -1,0 +1,2 @@
+web: gunicorn app:app --timeout 120 --workers 4 --worker-class sync --access-logfile - --error-logfile -
+release: python init_db.py && python model_trainer.py

@@ -9,6 +9,7 @@ from models import db
 from auth import auth_bp
 from detection_routes import detection_bp
 from utility_routes import utils_bp
+from translation_routes import translation_bp
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -28,6 +29,7 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp)
     app.register_blueprint(detection_bp)
     app.register_blueprint(utils_bp)
+    app.register_blueprint(translation_bp)
 
     @app.before_request
     def before_request():
