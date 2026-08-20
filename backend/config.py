@@ -1,13 +1,6 @@
 import os
 from datetime import timedelta
 
-def _get_database_url(default_url='postgresql://postgres:password@localhost:5432/sign_detection'):
-    """Get database URL with proper SSL handling for Render PostgreSQL"""
-    db_url = os.getenv('DATABASE_URL', default_url)
-    if db_url and db_url.startswith('postgresql://') and '?sslmode=' not in db_url:
-        db_url += '?sslmode=require'
-    return db_url
-
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
@@ -16,6 +9,14 @@ class Config:
         'sqlite:///sign_detection.db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Disable query echo except in debug
+    SQLALCHEMY_ECHO = False
+    # Use connection pooling
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 10,
+        'pool_recycle': 3600,
+        'pool_pre_ping': True,
+    }
 
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-prod')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
@@ -41,8 +42,29 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Use PostgreSQL for production with SSL
-    SQLALCHEMY_DATABASE_URI = _get_database_url()
+    # Use PostgreSQL for production - Render provides DATABASE_URL with proper SSL
+    db_url = os.getenv('DATABASE_URL', '')
+
+    # Fix: Render's PostgreSQL URL might have rediss:// or needs SSL params
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+
+    if db_url.startswith('rediss://'):
+        db_url = db_url.replace('rediss://', 'postgresql://', 1)
+
+    # Add SSL params only if not already present
+    if '?sslmode=' not in db_url and db_url.startswith('postgresql://'):
+        db_url += '?sslmode=prefer'
+
+    SQLALCHEMY_DATABASE_URI = db_url if db_url else 'sqlite:///sign_detection.db'
+
+    # Connection pool settings for Render
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 5,
+        'pool_recycle': 1800,
+        'pool_pre_ping': True,
+        'max_overflow': 10,
+    }
 
 
 class TestingConfig(Config):
