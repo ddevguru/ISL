@@ -1,10 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from config import config
 import os
 from pathlib import Path
 from sqlalchemy import text
+import logging
+from datetime import datetime
 
 from models import db
 from auth import auth_bp
@@ -34,7 +36,30 @@ def create_app(config_name='development'):
 
     @app.before_request
     def before_request():
-        pass
+        request.start_time = datetime.now()
+        print(f"\n{'='*60}")
+        print(f"📨 INCOMING REQUEST: {datetime.now()}")
+        print(f"Method: {request.method}")
+        print(f"Path: {request.path}")
+        print(f"Remote Address: {request.remote_addr}")
+        print(f"User Agent: {request.user_agent}")
+        print(f"Content Type: {request.content_type}")
+        if request.data:
+            print(f"Body: {request.data[:500]}")
+        print(f"{'='*60}\n")
+
+    @app.after_request
+    def after_request(response):
+        if hasattr(request, 'start_time'):
+            duration = (datetime.now() - request.start_time).total_seconds()
+            print(f"\n{'='*60}")
+            print(f"✅ RESPONSE: {datetime.now()}")
+            print(f"Path: {request.path}")
+            print(f"Status: {response.status_code}")
+            print(f"Duration: {duration:.3f}s")
+            print(f"Response Size: {len(response.data)} bytes")
+            print(f"{'='*60}\n")
+        return response
 
     @app.errorhandler(404)
     def not_found(error):

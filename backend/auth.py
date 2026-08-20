@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from models import db, User
 from datetime import datetime
 import re
+import logging
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -21,10 +22,15 @@ def validate_password(password):
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
+    print("\n" + "="*60)
+    print("🔐 SIGNUP REQUEST RECEIVED")
+    print("="*60)
     try:
         data = request.get_json()
+        print(f"✓ Received JSON data: {data}")
 
         if not data:
+            print("❌ No data provided")
             return jsonify({'error': 'No data provided'}), 400
 
         username = data.get('username')
@@ -33,22 +39,34 @@ def signup():
         first_name = data.get('first_name', '')
         last_name = data.get('last_name', '')
 
+        print(f"✓ Username: {username}")
+        print(f"✓ Email: {email}")
+        print(f"✓ First Name: {first_name}")
+
         if not all([username, email, password]):
+            print("❌ Missing required fields")
             return jsonify({'error': 'Username, email, and password are required'}), 400
 
         if not validate_email(email):
+            print("❌ Invalid email format")
             return jsonify({'error': 'Invalid email format'}), 400
 
         is_valid, message = validate_password(password)
         if not is_valid:
+            print(f"❌ Password validation failed: {message}")
             return jsonify({'error': message}), 400
 
-        if User.query.filter_by(username=username).first():
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            print("❌ Username already exists")
             return jsonify({'error': 'Username already exists'}), 409
 
-        if User.query.filter_by(email=email).first():
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            print("❌ Email already exists")
             return jsonify({'error': 'Email already exists'}), 409
 
+        print("✓ Validation passed, creating user...")
         user = User(
             username=username,
             email=email,
@@ -59,8 +77,13 @@ def signup():
 
         db.session.add(user)
         db.session.commit()
+        print(f"✓ User created with ID: {user.id}")
 
         access_token = create_access_token(identity=user.id)
+        print(f"✓ Access token created")
+
+        print("✅ SIGNUP SUCCESSFUL")
+        print("="*60 + "\n")
 
         return jsonify({
             'message': 'User created successfully',
@@ -69,6 +92,10 @@ def signup():
         }), 201
 
     except Exception as e:
+        print(f"❌ SIGNUP FAILED: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("="*60 + "\n")
         db.session.rollback()
         return jsonify({'error': f'Signup failed: {str(e)}'}), 500
 
