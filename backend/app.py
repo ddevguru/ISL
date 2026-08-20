@@ -13,6 +13,7 @@ from auth import auth_bp
 from detection_routes import detection_bp
 from utility_routes import utils_bp
 from translation_routes import translation_bp
+from user_routes import user_bp
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -30,6 +31,7 @@ def create_app(config_name='development'):
     os.makedirs(app.config['SIGN_LANGUAGE_DATASET_PATH'], exist_ok=True)
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(user_bp)
     app.register_blueprint(detection_bp)
     app.register_blueprint(utils_bp)
     app.register_blueprint(translation_bp)

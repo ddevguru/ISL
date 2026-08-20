@@ -15,12 +15,20 @@ class User(db.Model):
     first_name = db.Column(db.String(80))
     last_name = db.Column(db.String(80))
     profile_picture = db.Column(db.String(255))
+    bio = db.Column(db.Text)
+    phone_number = db.Column(db.String(20))
+    country = db.Column(db.String(100))
+    language_preference = db.Column(db.String(10), default='en')
+    is_online = db.Column(db.Boolean, default=False)
+    last_seen = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
 
     history = db.relationship('UserHistory', backref='user', lazy=True, cascade='all, delete-orphan')
     saved_signs = db.relationship('SavedSign', backref='user', lazy=True, cascade='all, delete-orphan')
+    call_requests_sent = db.relationship('CallRequest', foreign_keys='CallRequest.caller_id', backref='caller', lazy=True)
+    call_requests_received = db.relationship('CallRequest', foreign_keys='CallRequest.receiver_id', backref='receiver', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -36,6 +44,12 @@ class User(db.Model):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'profile_picture': self.profile_picture,
+            'bio': self.bio,
+            'phone_number': self.phone_number,
+            'country': self.country,
+            'language_preference': self.language_preference,
+            'is_online': self.is_online,
+            'last_seen': self.last_seen.isoformat() if self.last_seen else None,
             'created_at': self.created_at.isoformat(),
             'is_active': self.is_active
         }
@@ -208,4 +222,33 @@ class SignLearningProgress(db.Model):
             'accuracy': self.accuracy,
             'last_practiced': self.last_practiced.isoformat() if self.last_practiced else None,
             'mastered': self.mastered
+        }
+
+
+class CallRequest(db.Model):
+    __tablename__ = 'call_requests'
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    caller_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    receiver_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(50), default='pending')
+    call_type = db.Column(db.String(50), default='video')
+    started_at = db.Column(db.DateTime)
+    ended_at = db.Column(db.DateTime)
+    duration = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'caller_id': self.caller_id,
+            'caller_name': self.caller.first_name if self.caller else None,
+            'receiver_id': self.receiver_id,
+            'receiver_name': self.receiver.first_name if self.receiver else None,
+            'status': self.status,
+            'call_type': self.call_type,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'ended_at': self.ended_at.isoformat() if self.ended_at else None,
+            'duration': self.duration,
+            'created_at': self.created_at.isoformat()
         }

@@ -101,16 +101,24 @@ def signup():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    print("\n" + "="*60)
+    print("🔓 LOGIN REQUEST RECEIVED")
+    print("="*60)
     try:
         data = request.get_json()
+        print(f"✓ Received login data")
 
         if not data:
+            print("❌ No data provided")
             return jsonify({'error': 'No data provided'}), 400
 
         username_or_email = data.get('username_or_email')
         password = data.get('password')
 
+        print(f"✓ Username/Email: {username_or_email}")
+
         if not all([username_or_email, password]):
+            print("❌ Missing username/email or password")
             return jsonify({'error': 'Username/Email and password are required'}), 400
 
         user = User.query.filter(
@@ -118,12 +126,24 @@ def login():
         ).first()
 
         if not user or not user.check_password(password):
+            print("❌ Invalid credentials")
             return jsonify({'error': 'Invalid username/email or password'}), 401
 
         if not user.is_active:
+            print("❌ Account is inactive")
             return jsonify({'error': 'Account is inactive'}), 403
 
+        # Update user status to online
+        user.is_online = True
+        user.updated_at = datetime.utcnow()
+        db.session.commit()
+        print(f"✓ User status updated to online")
+
         access_token = create_access_token(identity=user.id)
+        print(f"✓ Access token created")
+
+        print("✅ LOGIN SUCCESSFUL")
+        print("="*60 + "\n")
 
         return jsonify({
             'message': 'Login successful',
@@ -132,6 +152,10 @@ def login():
         }), 200
 
     except Exception as e:
+        print(f"❌ LOGIN FAILED: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("="*60 + "\n")
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
 
 @auth_bp.route('/profile', methods=['GET'])
