@@ -52,9 +52,13 @@ class ProductionConfig(Config):
     if db_url.startswith('rediss://'):
         db_url = db_url.replace('rediss://', 'postgresql://', 1)
 
-    # Add SSL params only if not already present
-    if '?sslmode=' not in db_url and db_url.startswith('postgresql://'):
-        db_url += '?sslmode=prefer'
+    # Remove existing SSL params and add lenient SSL mode
+    if '?' in db_url:
+        db_url = db_url.split('?')[0]
+
+    # Use sslmode=allow to bypass certificate verification issues
+    if db_url.startswith('postgresql://'):
+        db_url += '?sslmode=allow'
 
     SQLALCHEMY_DATABASE_URI = db_url if db_url else 'sqlite:///sign_detection.db'
 
@@ -64,6 +68,9 @@ class ProductionConfig(Config):
         'pool_recycle': 1800,
         'pool_pre_ping': True,
         'max_overflow': 10,
+        'connect_args': {
+            'sslmode': 'allow',
+        }
     }
 
 
