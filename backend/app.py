@@ -101,8 +101,36 @@ def create_app(config_name='development'):
                 'database': f'error: {str(e)}'
             }), 500
 
+    def _run_migrations():
+        """Run database migrations to add missing columns"""
+        try:
+            columns_to_check = [
+                ('profile_picture', 'VARCHAR(255)'),
+                ('bio', 'TEXT'),
+                ('phone_number', 'VARCHAR(20)'),
+                ('country', 'VARCHAR(100)'),
+                ('language_preference', "VARCHAR(10) DEFAULT 'en'"),
+                ('is_online', 'BOOLEAN DEFAULT FALSE'),
+                ('last_seen', 'TIMESTAMP'),
+                ('created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'),
+                ('updated_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'),
+                ('is_active', 'BOOLEAN DEFAULT TRUE'),
+            ]
+
+            for col_name, col_type in columns_to_check:
+                try:
+                    query = f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_type}"
+                    db.session.execute(text(query))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+                    pass
+        except Exception as e:
+            print(f"Migration error: {e}")
+
     with app.app_context():
         db.create_all()
+        _run_migrations()
 
     return app
 
