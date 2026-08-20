@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import '../config/api_config.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
+import '../screens/onboarding_screen.dart';
 import 'home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
   bool isLogin = true;
-  bool isLoading = false;
+  bool _obscurePassword = true;
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final usernameController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
 
   @override
   void dispose() {
@@ -24,246 +27,348 @@ class _AuthScreenState extends State<AuthScreen> {
     passwordController.dispose();
     usernameController.dispose();
     firstNameController.dispose();
+    lastNameController.dispose();
     super.dispose();
   }
 
-  Future<void> signup() async {
+  Future<void> _handleSignup(AuthService authService) async {
     if (usernameController.text.isEmpty ||
         emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('सभी फील्ड भरें')),
-      );
+        passwordController.text.isEmpty ||
+        firstNameController.text.isEmpty) {
+      _showError('सभी फील्ड भरें');
       return;
     }
 
-    setState(() => isLoading = true);
+    final success = await authService.signup(
+      username: usernameController.text,
+      email: emailController.text,
+      password: passwordController.text,
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+    );
 
-    try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.signupEndpoint),
-        headers: ApiConfig.defaultHeaders,
-        body: jsonEncode({
-          'username': usernameController.text,
-          'email': emailController.text,
-          'password': passwordController.text,
-          'first_name': firstNameController.text,
-        }),
-      );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        await _saveToken(data['access_token']);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✅ Signup सफल!')),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+    if (mounted) {
+      if (success) {
+        _showSuccess('✅ Signup सफल!');
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          }
+        });
       } else {
-        final error = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ ${error['error']}')),
-        );
+        _showError(authService.error ?? 'Signup failed');
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Error: $e')),
-      );
-    } finally {
-      setState(() => isLoading = false);
     }
   }
 
-  Future<void> login() async {
+  Future<void> _handleLogin(AuthService authService) async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email और Password भरें')),
-      );
+      _showError('Email और Password भरें');
       return;
     }
 
-    setState(() => isLoading = true);
+    final success = await authService.login(
+      usernameOrEmail: emailController.text,
+      password: passwordController.text,
+    );
 
-    try {
-      final response = await http.post(
-        Uri.parse(ApiConfig.loginEndpoint),
-        headers: ApiConfig.defaultHeaders,
-        body: jsonEncode({
-          'username_or_email': emailController.text,
-          'password': passwordController.text,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        await _saveToken(data['access_token']);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✅ Login सफल!')),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+    if (mounted) {
+      if (success) {
+        _showSuccess('✅ Login सफल!');
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          }
+        });
       } else {
-        final error = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ ${error['error']}')),
-        );
+        _showError(authService.error ?? 'Login failed');
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Error: $e')),
-      );
-    } finally {
-      setState(() => isLoading = false);
     }
   }
 
-  Future<void> _saveToken(String token) async {
-    // TODO: Save token using shared_preferences
-    // For now, just store in memory
-    ApiConfig.authToken = token;
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _toggleAuthMode() {
+    setState(() {
+      isLogin = !isLogin;
+      emailController.clear();
+      passwordController.clear();
+      usernameController.clear();
+      firstNameController.clear();
+      lastNameController.clear();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isLogin ? 'Login' : 'Signup'),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo/Title
-              SizedBox(height: 30),
-              Text(
-                '🤟 Sign Language Detection',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-              SizedBox(height: 40),
-
-              // Email Field
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: isLogin ? 'Email या Username' : 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-              ),
-              SizedBox(height: 15),
-
-              // Username Field (Signup only)
-              if (!isLogin)
-                Column(
-                  children: [
-                    TextField(
-                      controller: usernameController,
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                      ),
+      body: Consumer<AuthService>(
+        builder: (context, authService, _) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.deepPurple.shade400, Colors.deepPurple.shade700],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    SizedBox(height: 15),
-                  ],
-                ),
-
-              // First Name Field (Signup only)
-              if (!isLogin)
-                Column(
-                  children: [
-                    TextField(
-                      controller: firstNameController,
-                      decoration: InputDecoration(
-                        labelText: 'First Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
+                  child: Column(
+                    children: [
+                      const Text(
+                        '🤟',
+                        style: TextStyle(fontSize: 48),
                       ),
-                    ),
-                    SizedBox(height: 15),
-                  ],
-                ),
-
-              // Password Field
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-              ),
-              SizedBox(height: 30),
-
-              // Login/Signup Button
-              isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: isLogin ? login : signup,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 100,
-                          vertical: 15,
-                        ),
-                      ),
-                      child: Text(
-                        isLogin ? 'Login' : 'Signup',
-                        style: TextStyle(
-                          fontSize: 16,
+                      const SizedBox(height: 10),
+                      Text(
+                        isLogin ? 'Welcome Back!' : 'Create Account',
+                        style: const TextStyle(
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                    ),
-              SizedBox(height: 20),
-
-              // Toggle Login/Signup
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(isLogin ? 'नया user? ' : 'पहले से account है? '),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isLogin = !isLogin;
-                        emailController.clear();
-                        passwordController.clear();
-                        usernameController.clear();
-                        firstNameController.clear();
-                      });
-                    },
-                    child: Text(
-                      isLogin ? 'Signup करें' : 'Login करें',
-                      style: TextStyle(
-                        color: Colors.deepPurple,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8),
+                      Text(
+                        isLogin
+                            ? 'Login to continue'
+                            : 'Join our ISL community',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withAlpha(200),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
+                ),
+
+                // Form
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Email Field
+                      const Text('Email',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          hintText:
+                              isLogin ? 'Email या Username' : 'your@email.com',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Username Field (Signup only)
+                      if (!isLogin) ...[
+                        const Text('Username',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                            hintText: 'username123',
+                            prefixIcon: const Icon(Icons.person_outline),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+
+                      // First Name (Signup only)
+                      if (!isLogin) ...[
+                        const Text('First Name',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: firstNameController,
+                          decoration: InputDecoration(
+                            hintText: 'First',
+                            prefixIcon: const Icon(Icons.person_outline),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+
+                      // Last Name (Signup only)
+                      if (!isLogin) ...[
+                        const Text('Last Name',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: lastNameController,
+                          decoration: InputDecoration(
+                            hintText: 'Last',
+                            prefixIcon: const Icon(Icons.person_outline),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+
+                      // Password Field
+                      const Text('Password',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          hintText: '••••••••',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Submit Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: authService.isLoading
+                              ? null
+                              : () {
+                                  if (isLogin) {
+                                    _handleLogin(authService);
+                                  } else {
+                                    _handleSignup(authService);
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            disabledBackgroundColor: Colors.grey.shade300,
+                          ),
+                          child: authService.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : Text(
+                                  isLogin ? 'Login' : 'Create Account',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Toggle Auth Mode
+                      Center(
+                        child: RichText(
+                          text: TextSpan(
+                            text: isLogin
+                                ? 'Don\'t have an account? '
+                                : 'Already have an account? ',
+                            style: TextStyle(color: Colors.grey.shade600),
+                            children: [
+                              TextSpan(
+                                text:
+                                    isLogin ? 'Sign Up' : 'Log In',
+                                style: const TextStyle(
+                                  color: Colors.deepPurple,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                recognizer: _toggleAuthMode as dynamic,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Center(
+                        child: TextButton(
+                          onPressed: _toggleAuthMode,
+                          child: Text(
+                            isLogin ? 'Sign Up' : 'Log In',
+                            style: const TextStyle(
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
