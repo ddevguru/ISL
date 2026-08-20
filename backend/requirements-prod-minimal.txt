@@ -1,5 +1,5 @@
-# Production requirements - pre-built wheels only
-# Python 3.11 compatible
+# Production requirements - pre-built wheels only, no compilation
+# For Python 3.11 on Render
 
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
