@@ -14,6 +14,7 @@ from detection_routes import detection_bp
 from utility_routes import utils_bp
 from translation_routes import translation_bp
 from user_routes import user_bp
+from call_signaling import call_bp
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -32,6 +33,7 @@ def create_app(config_name='development'):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(call_bp)
     app.register_blueprint(detection_bp)
     app.register_blueprint(utils_bp)
     app.register_blueprint(translation_bp)
