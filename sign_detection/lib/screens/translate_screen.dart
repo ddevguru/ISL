@@ -76,41 +76,26 @@ class _TranslateScreenState extends State<TranslateScreen> {
   }
 
   Future<List<int>> _convertCameraImage(CameraImage image) async {
-    final convertedImage = img.Image(
-      width: image.width,
-      height: image.height,
-    );
-
     final planes = image.planes;
-    final uvPixelStride = planes[1].bytesPerPixel ?? 1;
+    final buffer = planes[0].bytes;
 
-    for (int x = 0; x < image.width; x++) {
-      for (int y = 0; y < image.height; y++) {
-        final uvIndex = uvPixelStride * (x ~/ 2) + (y ~/ 2) * planes[1].bytesPerRow;
-        final index = y * image.width + x;
+    try {
+      // Create image from raw bytes using a simpler method
+      final image16 = img.Image.fromBytes(
+        width: image.width,
+        height: image.height,
+        bytes: buffer.buffer,
+        format: img.Format.uint8,
+      );
 
-        final yp = planes[0].bytes[y * planes[0].bytesPerRow + x];
-        final up = planes[1].bytes[uvIndex];
-        final vp = planes[2].bytes[uvIndex];
-
-        convertedImage.data![index] = yuv2rgb(yp, up, vp);
-      }
+      return img.encodeJpg(image16);
+    } catch (e) {
+      print('Image conversion error: $e');
+      // Fallback: just return the bytes as-is
+      return buffer;
     }
-
-    return img.encodeJpg(convertedImage);
   }
 
-  int yuv2rgb(int y, int u, int v) {
-    int r = ((y - 16) * 298 + (v - 128) * 409 + 128) ~/ 256;
-    int g = ((y - 16) * 298 - (u - 128) * 100 - (v - 128) * 208 + 128) ~/ 256;
-    int b = ((y - 16) * 298 + (u - 128) * 516 + 128) ~/ 256;
-
-    r = r.clamp(0, 255);
-    g = g.clamp(0, 255);
-    b = b.clamp(0, 255);
-
-    return 0xff000000 | ((r << 16) & 0xff0000) | ((g << 8) & 0xff00) | (b & 0xff);
-  }
 
   Future<void> _detectSign(String base64Image) async {
     try {

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'auth_screen.dart';
+import 'translate_screen.dart';
+import 'calls_screen.dart';
+import 'learn_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -435,57 +438,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTranslateScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.translate, size: 80, color: Colors.deepPurple),
-          SizedBox(height: 20),
-          Text('Translate Screen', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => setState(() => _currentIndex = 0),
-            child: Text('Go to Home'),
-          ),
-        ],
-      ),
-    );
+    return const TranslateScreen();
   }
 
   Widget _buildCallsScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.video_call, size: 80, color: Colors.deepPurple),
-          SizedBox(height: 20),
-          Text('Calls Screen', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => setState(() => _currentIndex = 0),
-            child: Text('Go to Home'),
-          ),
-        ],
-      ),
-    );
+    return const CallsScreen();
   }
 
   Widget _buildLearnScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.school, size: 80, color: Colors.deepPurple),
-          SizedBox(height: 20),
-          Text('Learn Screen', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => setState(() => _currentIndex = 0),
-            child: Text('Go to Home'),
-          ),
-        ],
-      ),
-    );
+    return const LearnScreen();
   }
 
   Widget _buildProfileScreen() {

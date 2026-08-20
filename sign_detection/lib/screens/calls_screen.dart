@@ -117,7 +117,10 @@ class _CallsScreenState extends State<CallsScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        setState(() => callHistory = List<Map<String, dynamic>>.from(data['history']));
+        final history = data['history'] as List?;
+        if (history != null) {
+          setState(() => callHistory = List<Map<String, dynamic>>.from(history));
+        }
       }
     } catch (e) {
       print('Error loading history: $e');

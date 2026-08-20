@@ -49,7 +49,10 @@ class _LearnScreenState extends State<LearnScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        setState(() => signs = List<Map<String, dynamic>>.from(data['signs']));
+        final signsList = data['signs'] as List?;
+        if (signsList != null) {
+          setState(() => signs = List<Map<String, dynamic>>.from(signsList));
+        }
       }
     } catch (e) {
       print('Error loading signs: $e');

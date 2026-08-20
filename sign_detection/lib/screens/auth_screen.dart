@@ -328,37 +328,25 @@ class _AuthScreenState extends State<AuthScreen> {
 
                       // Toggle Auth Mode
                       Center(
-                        child: RichText(
-                          text: TextSpan(
-                            text: isLogin
-                                ? 'Don\'t have an account? '
-                                : 'Already have an account? ',
-                            style: TextStyle(color: Colors.grey.shade600),
+                        child: TextButton(
+                          onPressed: _toggleAuthMode,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextSpan(
-                                text:
-                                    isLogin ? 'Sign Up' : 'Log In',
+                              Text(
+                                isLogin
+                                    ? 'Don\'t have an account? '
+                                    : 'Already have an account? ',
+                                style: TextStyle(color: Colors.grey.shade600),
+                              ),
+                              Text(
+                                isLogin ? 'Sign Up' : 'Log In',
                                 style: const TextStyle(
                                   color: Colors.deepPurple,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                recognizer: _toggleAuthMode as dynamic,
                               ),
                             ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Center(
-                        child: TextButton(
-                          onPressed: _toggleAuthMode,
-                          child: Text(
-                            isLogin ? 'Sign Up' : 'Log In',
-                            style: const TextStyle(
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
                           ),
                         ),
                       ),
