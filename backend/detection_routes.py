@@ -87,6 +87,8 @@ def detect_from_frame():
     try:
         user_id = get_jwt_identity()
         data = request.get_json()
+        # Debug: log incoming request payload (truncated for brevity)
+        print('DEBUG: Received detection request payload keys:', list(data.keys()))
 
         if 'frame' not in data:
             return jsonify({'error': 'No frame provided'}), 400
@@ -108,6 +110,8 @@ def detect_from_frame():
         target_sign = data.get('target_sign')
 
         result = video_processor.process_camera_frame(frame, min_confidence)
+        # Debug: log the detection result
+        print('DEBUG: Detection result:', result)
 
         # If a practice target sign is specified, validate matching core gesture
         if target_sign and result.get('sign'):
