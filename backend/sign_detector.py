@@ -31,16 +31,27 @@ class ISLSignDetector:
         self._load_model()
 
     def _load_model(self):
-        model_path = self.models_dir / f"{self.model_name}.h5"
+        # Try TensorFlow model first
+        model_path_tf = self.models_dir / f"{self.model_name}.h5"
+        # Try sklearn model
+        model_path_sk = self.models_dir / f"{self.model_name}.pkl"
         encoder_path = self.models_dir / f"{self.model_name}_encoder.pkl"
         metadata_path = self.models_dir / f"{self.model_name}_metadata.json"
 
         try:
-            if not model_path.exists():
-                print(f"⚠️ Model not found: {model_path}")
+            # Try TensorFlow model
+            if model_path_tf.exists():
+                self.model = keras.models.load_model(str(model_path_tf))
+                print(f"✅ Loaded TensorFlow model")
+            # Try sklearn model
+            elif model_path_sk.exists():
+                with open(model_path_sk, 'rb') as f:
+                    self.model = pickle.load(f)
+                print(f"✅ Loaded sklearn model")
+            else:
+                print(f"⚠️ Model not found: {model_path_tf} or {model_path_sk}")
                 return False
 
-            self.model = keras.models.load_model(str(model_path))
             if encoder_path.exists():
                 with open(encoder_path, 'rb') as f:
                     self.label_encoder = pickle.load(f)
@@ -74,9 +85,19 @@ class ISLSignDetector:
 
         try:
             landmarks = np.array(landmarks).reshape(1, -1)
-            predictions = self.model.predict(landmarks, verbose=0)
-            idx = np.argmax(predictions[0])
-            confidence = float(predictions[0][idx])
+
+            # Check if it's sklearn model (has predict_proba) or TensorFlow
+            if hasattr(self.model, 'predict_proba'):
+                # sklearn model
+                proba = self.model.predict_proba(landmarks)[0]
+                confidence = float(np.max(proba))
+                idx = np.argmax(proba)
+            else:
+                # TensorFlow model
+                predictions = self.model.predict(landmarks, verbose=0)
+                idx = np.argmax(predictions[0])
+                confidence = float(predictions[0][idx])
+
             sign = self.label_encoder.inverse_transform([idx])[0]
             return {'success': True, 'sign': sign, 'confidence': confidence}
         except Exception as e:
@@ -93,6 +114,24 @@ class ISLSignDetector:
             return self.predict_sign(landmarks)
         except Exception as e:
             return {'success': False, 'error': str(e), 'sign': None}
+
+    def process_video_frame(self, frame: np.ndarray, min_confidence: float = 0.5) -> tuple:
+        """Process a video frame and return (sign, confidence, annotated_frame)"""
+        try:
+            landmarks = self.extract_landmarks(frame)
+            if landmarks is None:
+                return None, 0.0, frame
+
+            result = self.predict_sign(landmarks)
+            if result['success']:
+                sign = result['sign']
+                confidence = result['confidence']
+                if confidence >= min_confidence:
+                    return sign, confidence, frame
+            return None, 0.0, frame
+        except Exception as e:
+            print(f"Error processing frame: {e}")
+            return None, 0.0, frame
 
 def get_detector():
     global detector

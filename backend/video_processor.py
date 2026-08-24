@@ -14,8 +14,8 @@ class VideoProcessor:
     def _get_detector(self):
         """Lazy initialization of detector"""
         if self.detector is None:
-            from sign_detector import SignDetector
-            self.detector = SignDetector()
+            from sign_detector import ISLSignDetector
+            self.detector = ISLSignDetector()
         return self.detector
 
     def process_video_file(self, video_path, output_path=None, min_confidence=0.5):

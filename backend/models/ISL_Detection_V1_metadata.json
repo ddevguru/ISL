@@ -1,0 +1,1859 @@
+{
+  "signs": [
+    "HELLO",
+    "GOODBYE",
+    "THANK_YOU",
+    "WELCOME",
+    "SORRY",
+    "PLEASE",
+    "EXCUSE_ME",
+    "NICE_TO_MEET",
+    "GOOD_MORNING",
+    "GOOD_EVENING",
+    "YES",
+    "NO",
+    "OK",
+    "GOOD",
+    "BAD",
+    "BETTER",
+    "BEST",
+    "EXCELLENT",
+    "PERFECT",
+    "WONDERFUL",
+    "I",
+    "YOU",
+    "HE",
+    "SHE",
+    "WE",
+    "THEY",
+    "THIS",
+    "THAT",
+    "EVERYONE",
+    "SOMEONE",
+    "EAT",
+    "DRINK",
+    "SLEEP",
+    "WAKE_UP",
+    "WORK",
+    "PLAY",
+    "STUDY",
+    "READ",
+    "WRITE",
+    "WALK",
+    "RUN",
+    "DANCE",
+    "SING",
+    "LISTEN",
+    "SPEAK",
+    "HOME",
+    "SCHOOL",
+    "HOSPITAL",
+    "MARKET",
+    "OFFICE",
+    "PARK",
+    "TEMPLE",
+    "CHURCH",
+    "MOSQUE",
+    "CITY",
+    "VILLAGE",
+    "STREET",
+    "BEACH",
+    "MOUNTAIN",
+    "RIVER",
+    "HAPPY",
+    "SAD",
+    "ANGRY",
+    "SCARED",
+    "SURPRISED",
+    "LOVE",
+    "HATE",
+    "CONFUSED",
+    "EXCITED",
+    "TIRED",
+    "PROUD",
+    "ASHAMED",
+    "ZERO",
+    "ONE",
+    "TWO",
+    "THREE",
+    "FOUR",
+    "FIVE",
+    "SIX",
+    "SEVEN",
+    "EIGHT",
+    "NINE",
+    "TEN",
+    "TWENTY",
+    "FIFTY",
+    "HUNDRED",
+    "THOUSAND",
+    "NOW",
+    "TODAY",
+    "YESTERDAY",
+    "TOMORROW",
+    "MORNING",
+    "AFTERNOON",
+    "EVENING",
+    "NIGHT",
+    "WEEK",
+    "MONTH",
+    "YEAR",
+    "MONDAY",
+    "FRIDAY",
+    "SUNDAY",
+    "WHAT",
+    "WHERE",
+    "WHEN",
+    "WHY",
+    "WHO",
+    "HOW",
+    "HOW_MUCH",
+    "HOW_MANY",
+    "MOTHER",
+    "FATHER",
+    "BROTHER",
+    "SISTER",
+    "SON",
+    "DAUGHTER",
+    "GRANDFATHER",
+    "GRANDMOTHER",
+    "FRIEND",
+    "HUSBAND",
+    "WIFE",
+    "CHILD",
+    "BABY",
+    "WOMAN",
+    "MAN",
+    "FOOD",
+    "BREAD",
+    "RICE",
+    "WATER",
+    "MILK",
+    "TEA",
+    "APPLE",
+    "ORANGE",
+    "MANGO",
+    "BANANA",
+    "CHICKEN",
+    "FISH",
+    "MEAT",
+    "SWEET",
+    "SALT",
+    "SICK",
+    "PAIN",
+    "DOCTOR",
+    "MEDICINE",
+    "HOSPITAL",
+    "FEVER",
+    "COUGH",
+    "COLD",
+    "HEADACHE",
+    "TOOTHACHE",
+    "HEALTHY",
+    "EXERCISE",
+    "RED",
+    "BLUE",
+    "GREEN",
+    "YELLOW",
+    "WHITE",
+    "BLACK",
+    "ORANGE",
+    "PINK",
+    "PURPLE",
+    "BROWN",
+    "DOG",
+    "CAT",
+    "BIRD",
+    "FISH",
+    "HORSE",
+    "COW",
+    "ELEPHANT",
+    "LION",
+    "TIGER",
+    "MONKEY",
+    "WEATHER",
+    "SUN",
+    "MOON",
+    "RAIN",
+    "SNOW",
+    "WIND",
+    "CLOUD",
+    "LIGHTNING",
+    "THUNDER",
+    "COLD_WEATHER",
+    "HOT_WEATHER",
+    "CRICKET",
+    "FOOTBALL",
+    "BASKETBALL",
+    "TENNIS",
+    "BADMINTON",
+    "HOCKEY",
+    "SWIMMING",
+    "RUNNING",
+    "CYCLING",
+    "BOXING",
+    "CHAIR",
+    "TABLE",
+    "DOOR",
+    "WINDOW",
+    "BOOK",
+    "PEN",
+    "PAPER",
+    "PHONE",
+    "CAR",
+    "TRAIN",
+    "BICYCLE",
+    "PLANE",
+    "GIVE",
+    "TAKE",
+    "SHOW",
+    "HIDE",
+    "OPEN",
+    "CLOSE",
+    "PUSH",
+    "PULL",
+    "THROW",
+    "CATCH",
+    "CLIMB",
+    "JUMP",
+    "FALL",
+    "SIT",
+    "STAND",
+    "CONTINUE",
+    "STOP",
+    "WAIT",
+    "THINK",
+    "KNOW",
+    "FORGET",
+    "BELIEVE",
+    "UNDERSTAND",
+    "PROMISE"
+  ],
+  "landmarks_size": 42,
+  "model_version": "V3-comprehensive",
+  "model_type": "RandomForest",
+  "n_trees": 500,
+  "total_signs": 228,
+  "categories": [
+    "Greetings",
+    "Basic_Words",
+    "Pronouns",
+    "Daily_Activities",
+    "Places",
+    "Emotions",
+    "Numbers",
+    "Time",
+    "Questions",
+    "Family",
+    "Food",
+    "Health",
+    "Colors",
+    "Animals",
+    "Weather",
+    "Sports",
+    "Objects",
+    "Actions",
+    "Abstract"
+  ],
+  "training_samples": 22800,
+  "samples_per_sign": 100,
+  "accuracy": 0.9248684210526316,
+  "all_signs": [
+    {
+      "name": "HELLO",
+      "en": "Hello",
+      "hi": "नमस्ते",
+      "desc": "Wave hand near face",
+      "category": "Greetings"
+    },
+    {
+      "name": "GOODBYE",
+      "en": "Goodbye",
+      "hi": "अलविदा",
+      "desc": "Wave hand up and down",
+      "category": "Greetings"
+    },
+    {
+      "name": "THANK_YOU",
+      "en": "Thank You",
+      "hi": "धन्यवाद",
+      "desc": "Hand from mouth outward",
+      "category": "Greetings"
+    },
+    {
+      "name": "WELCOME",
+      "en": "Welcome",
+      "hi": "स्वागत है",
+      "desc": "Open arms wide",
+      "category": "Greetings"
+    },
+    {
+      "name": "SORRY",
+      "en": "Sorry",
+      "hi": "माफी",
+      "desc": "Hand over chest",
+      "category": "Greetings"
+    },
+    {
+      "name": "PLEASE",
+      "en": "Please",
+      "hi": "कृपया",
+      "desc": "Palms together up",
+      "category": "Greetings"
+    },
+    {
+      "name": "EXCUSE_ME",
+      "en": "Excuse Me",
+      "hi": "माफ कीजिए",
+      "desc": "Tap shoulder",
+      "category": "Greetings"
+    },
+    {
+      "name": "NICE_TO_MEET",
+      "en": "Nice to Meet",
+      "hi": "खुशी",
+      "desc": "Handshake",
+      "category": "Greetings"
+    },
+    {
+      "name": "GOOD_MORNING",
+      "en": "Good Morning",
+      "hi": "सुप्रभात",
+      "desc": "Sun rising + greeting",
+      "category": "Greetings"
+    },
+    {
+      "name": "GOOD_EVENING",
+      "en": "Good Evening",
+      "hi": "शुभ संध्या",
+      "desc": "Sun setting + greeting",
+      "category": "Greetings"
+    },
+    {
+      "name": "YES",
+      "en": "Yes",
+      "hi": "हाँ",
+      "desc": "Nod with thumbs up",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "NO",
+      "en": "No",
+      "hi": "नहीं",
+      "desc": "Shake head",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "OK",
+      "en": "OK",
+      "hi": "ठीक है",
+      "desc": "Thumbs up",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "GOOD",
+      "en": "Good",
+      "hi": "अच्छा",
+      "desc": "Thumbs up",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "BAD",
+      "en": "Bad",
+      "hi": "बुरा",
+      "desc": "Thumbs down",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "BETTER",
+      "en": "Better",
+      "hi": "बेहतर",
+      "desc": "Thumb up higher",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "BEST",
+      "en": "Best",
+      "hi": "सर्वश्रेष्ठ",
+      "desc": "Both thumbs high",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "EXCELLENT",
+      "en": "Excellent",
+      "hi": "शानदार",
+      "desc": "Clap hands",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "PERFECT",
+      "en": "Perfect",
+      "hi": "परिपूर्ण",
+      "desc": "Kiss fingers",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "WONDERFUL",
+      "en": "Wonderful",
+      "hi": "शानदार",
+      "desc": "Arms spread wide",
+      "category": "Basic_Words"
+    },
+    {
+      "name": "I",
+      "en": "I",
+      "hi": "मैं",
+      "desc": "Point to self",
+      "category": "Pronouns"
+    },
+    {
+      "name": "YOU",
+      "en": "You",
+      "hi": "तुम",
+      "desc": "Point forward",
+      "category": "Pronouns"
+    },
+    {
+      "name": "HE",
+      "en": "He",
+      "hi": "वह",
+      "desc": "Point to side",
+      "category": "Pronouns"
+    },
+    {
+      "name": "SHE",
+      "en": "She",
+      "hi": "वह",
+      "desc": "Point other side",
+      "category": "Pronouns"
+    },
+    {
+      "name": "WE",
+      "en": "We",
+      "hi": "हम",
+      "desc": "Circle with both",
+      "category": "Pronouns"
+    },
+    {
+      "name": "THEY",
+      "en": "They",
+      "hi": "वे",
+      "desc": "Spread arms",
+      "category": "Pronouns"
+    },
+    {
+      "name": "THIS",
+      "en": "This",
+      "hi": "यह",
+      "desc": "Point down",
+      "category": "Pronouns"
+    },
+    {
+      "name": "THAT",
+      "en": "That",
+      "hi": "वह",
+      "desc": "Point far",
+      "category": "Pronouns"
+    },
+    {
+      "name": "EVERYONE",
+      "en": "Everyone",
+      "hi": "सभी",
+      "desc": "Circle motion",
+      "category": "Pronouns"
+    },
+    {
+      "name": "SOMEONE",
+      "en": "Someone",
+      "hi": "कोई",
+      "desc": "Vague point",
+      "category": "Pronouns"
+    },
+    {
+      "name": "EAT",
+      "en": "Eat",
+      "hi": "खाना",
+      "desc": "Hand to mouth",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "DRINK",
+      "en": "Drink",
+      "hi": "पीना",
+      "desc": "Cup to lips",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "SLEEP",
+      "en": "Sleep",
+      "hi": "सोना",
+      "desc": "Head on hands",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "WAKE_UP",
+      "en": "Wake Up",
+      "hi": "जागना",
+      "desc": "Open eyes",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "WORK",
+      "en": "Work",
+      "hi": "काम",
+      "desc": "Fist to palm",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "PLAY",
+      "en": "Play",
+      "hi": "खेलना",
+      "desc": "Playful motion",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "STUDY",
+      "en": "Study",
+      "hi": "पढना",
+      "desc": "Open book",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "READ",
+      "en": "Read",
+      "hi": "पढना",
+      "desc": "Eyes follow motion",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "WRITE",
+      "en": "Write",
+      "hi": "लिखना",
+      "desc": "Writing motion",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "WALK",
+      "en": "Walk",
+      "hi": "चलना",
+      "desc": "Fingers walk",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "RUN",
+      "en": "Run",
+      "hi": "दौड़ना",
+      "desc": "Fast motion",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "DANCE",
+      "en": "Dance",
+      "hi": "नाचना",
+      "desc": "Sway motion",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "SING",
+      "en": "Sing",
+      "hi": "गाना",
+      "desc": "Hand motion from mouth",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "LISTEN",
+      "en": "Listen",
+      "hi": "सुनना",
+      "desc": "Hand to ear",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "SPEAK",
+      "en": "Speak",
+      "hi": "बोलना",
+      "desc": "Motion from mouth",
+      "category": "Daily_Activities"
+    },
+    {
+      "name": "HOME",
+      "en": "Home",
+      "hi": "घर",
+      "desc": "Roof shape",
+      "category": "Places"
+    },
+    {
+      "name": "SCHOOL",
+      "en": "School",
+      "hi": "स्कूल",
+      "desc": "Bell ring",
+      "category": "Places"
+    },
+    {
+      "name": "HOSPITAL",
+      "en": "Hospital",
+      "hi": "अस्पताल",
+      "desc": "Cross sign",
+      "category": "Places"
+    },
+    {
+      "name": "MARKET",
+      "en": "Market",
+      "hi": "बाजार",
+      "desc": "Buying motion",
+      "category": "Places"
+    },
+    {
+      "name": "OFFICE",
+      "en": "Office",
+      "hi": "कार्यालय",
+      "desc": "Desk motion",
+      "category": "Places"
+    },
+    {
+      "name": "PARK",
+      "en": "Park",
+      "hi": "पार्क",
+      "desc": "Tree motion",
+      "category": "Places"
+    },
+    {
+      "name": "TEMPLE",
+      "en": "Temple",
+      "hi": "मंदिर",
+      "desc": "Prayer hands",
+      "category": "Places"
+    },
+    {
+      "name": "CHURCH",
+      "en": "Church",
+      "hi": "गिरजाघर",
+      "desc": "Cross overhead",
+      "category": "Places"
+    },
+    {
+      "name": "MOSQUE",
+      "en": "Mosque",
+      "hi": "मस्जिद",
+      "desc": "Dome shape",
+      "category": "Places"
+    },
+    {
+      "name": "CITY",
+      "en": "City",
+      "hi": "शहर",
+      "desc": "Tall buildings",
+      "category": "Places"
+    },
+    {
+      "name": "VILLAGE",
+      "en": "Village",
+      "hi": "गाँव",
+      "desc": "Small houses",
+      "category": "Places"
+    },
+    {
+      "name": "STREET",
+      "en": "Street",
+      "hi": "सड़क",
+      "desc": "Two hands apart",
+      "category": "Places"
+    },
+    {
+      "name": "BEACH",
+      "en": "Beach",
+      "hi": "समुद्र तट",
+      "desc": "Wave motion",
+      "category": "Places"
+    },
+    {
+      "name": "MOUNTAIN",
+      "en": "Mountain",
+      "hi": "पहाड़",
+      "desc": "Triangle shape",
+      "category": "Places"
+    },
+    {
+      "name": "RIVER",
+      "en": "River",
+      "hi": "नदी",
+      "desc": "Flowing motion",
+      "category": "Places"
+    },
+    {
+      "name": "HAPPY",
+      "en": "Happy",
+      "hi": "खुश",
+      "desc": "Smile up",
+      "category": "Emotions"
+    },
+    {
+      "name": "SAD",
+      "en": "Sad",
+      "hi": "उदास",
+      "desc": "Frown down",
+      "category": "Emotions"
+    },
+    {
+      "name": "ANGRY",
+      "en": "Angry",
+      "hi": "गुस्सा",
+      "desc": "Fist clench",
+      "category": "Emotions"
+    },
+    {
+      "name": "SCARED",
+      "en": "Scared",
+      "hi": "डर",
+      "desc": "Hold self",
+      "category": "Emotions"
+    },
+    {
+      "name": "SURPRISED",
+      "en": "Surprised",
+      "hi": "आश्चर्य",
+      "desc": "Hands to mouth",
+      "category": "Emotions"
+    },
+    {
+      "name": "LOVE",
+      "en": "Love",
+      "hi": "प्यार",
+      "desc": "Cross over heart",
+      "category": "Emotions"
+    },
+    {
+      "name": "HATE",
+      "en": "Hate",
+      "hi": "नफरत",
+      "desc": "Push away",
+      "category": "Emotions"
+    },
+    {
+      "name": "CONFUSED",
+      "en": "Confused",
+      "hi": "भ्रमित",
+      "desc": "Head tilt",
+      "category": "Emotions"
+    },
+    {
+      "name": "EXCITED",
+      "en": "Excited",
+      "hi": "उत्साह",
+      "desc": "Jump motion",
+      "category": "Emotions"
+    },
+    {
+      "name": "TIRED",
+      "en": "Tired",
+      "hi": "थकान",
+      "desc": "Droop down",
+      "category": "Emotions"
+    },
+    {
+      "name": "PROUD",
+      "en": "Proud",
+      "hi": "गर्व",
+      "desc": "Chest out",
+      "category": "Emotions"
+    },
+    {
+      "name": "ASHAMED",
+      "en": "Ashamed",
+      "hi": "शर्मिंदा",
+      "desc": "Head down",
+      "category": "Emotions"
+    },
+    {
+      "name": "ZERO",
+      "en": "Zero",
+      "hi": "शून्य",
+      "desc": "O shape",
+      "category": "Numbers"
+    },
+    {
+      "name": "ONE",
+      "en": "One",
+      "hi": "एक",
+      "desc": "One finger",
+      "category": "Numbers"
+    },
+    {
+      "name": "TWO",
+      "en": "Two",
+      "hi": "दो",
+      "desc": "Two fingers",
+      "category": "Numbers"
+    },
+    {
+      "name": "THREE",
+      "en": "Three",
+      "hi": "तीन",
+      "desc": "Three fingers",
+      "category": "Numbers"
+    },
+    {
+      "name": "FOUR",
+      "en": "Four",
+      "hi": "चार",
+      "desc": "Four fingers",
+      "category": "Numbers"
+    },
+    {
+      "name": "FIVE",
+      "en": "Five",
+      "hi": "पाँच",
+      "desc": "All fingers",
+      "category": "Numbers"
+    },
+    {
+      "name": "SIX",
+      "en": "Six",
+      "hi": "छः",
+      "desc": "Six gesture",
+      "category": "Numbers"
+    },
+    {
+      "name": "SEVEN",
+      "en": "Seven",
+      "hi": "सात",
+      "desc": "Seven gesture",
+      "category": "Numbers"
+    },
+    {
+      "name": "EIGHT",
+      "en": "Eight",
+      "hi": "आठ",
+      "desc": "Eight gesture",
+      "category": "Numbers"
+    },
+    {
+      "name": "NINE",
+      "en": "Nine",
+      "hi": "नौ",
+      "desc": "Nine gesture",
+      "category": "Numbers"
+    },
+    {
+      "name": "TEN",
+      "en": "Ten",
+      "hi": "दस",
+      "desc": "Both hands open",
+      "category": "Numbers"
+    },
+    {
+      "name": "TWENTY",
+      "en": "Twenty",
+      "hi": "बीस",
+      "desc": "Two tens",
+      "category": "Numbers"
+    },
+    {
+      "name": "FIFTY",
+      "en": "Fifty",
+      "hi": "पचास",
+      "desc": "Five tens",
+      "category": "Numbers"
+    },
+    {
+      "name": "HUNDRED",
+      "en": "Hundred",
+      "hi": "सौ",
+      "desc": "C shape",
+      "category": "Numbers"
+    },
+    {
+      "name": "THOUSAND",
+      "en": "Thousand",
+      "hi": "हजार",
+      "desc": "M shape",
+      "category": "Numbers"
+    },
+    {
+      "name": "NOW",
+      "en": "Now",
+      "hi": "अभी",
+      "desc": "Point down fast",
+      "category": "Time"
+    },
+    {
+      "name": "TODAY",
+      "en": "Today",
+      "hi": "आज",
+      "desc": "Point to self",
+      "category": "Time"
+    },
+    {
+      "name": "YESTERDAY",
+      "en": "Yesterday",
+      "hi": "कल",
+      "desc": "Thumb back",
+      "category": "Time"
+    },
+    {
+      "name": "TOMORROW",
+      "en": "Tomorrow",
+      "hi": "कल",
+      "desc": "Thumb forward",
+      "category": "Time"
+    },
+    {
+      "name": "MORNING",
+      "en": "Morning",
+      "hi": "सुबह",
+      "desc": "Sun rising",
+      "category": "Time"
+    },
+    {
+      "name": "AFTERNOON",
+      "en": "Afternoon",
+      "hi": "दोपहर",
+      "desc": "Sun peak",
+      "category": "Time"
+    },
+    {
+      "name": "EVENING",
+      "en": "Evening",
+      "hi": "शाम",
+      "desc": "Sun setting",
+      "category": "Time"
+    },
+    {
+      "name": "NIGHT",
+      "en": "Night",
+      "hi": "रात",
+      "desc": "Moon stars",
+      "category": "Time"
+    },
+    {
+      "name": "WEEK",
+      "en": "Week",
+      "hi": "सप्ताह",
+      "desc": "Seven days",
+      "category": "Time"
+    },
+    {
+      "name": "MONTH",
+      "en": "Month",
+      "hi": "महीना",
+      "desc": "Finger across",
+      "category": "Time"
+    },
+    {
+      "name": "YEAR",
+      "en": "Year",
+      "hi": "साल",
+      "desc": "Circle motion",
+      "category": "Time"
+    },
+    {
+      "name": "MONDAY",
+      "en": "Monday",
+      "hi": "सोमवार",
+      "desc": "One + day",
+      "category": "Time"
+    },
+    {
+      "name": "FRIDAY",
+      "en": "Friday",
+      "hi": "शुक्रवार",
+      "desc": "Five + day",
+      "category": "Time"
+    },
+    {
+      "name": "SUNDAY",
+      "en": "Sunday",
+      "hi": "रविवार",
+      "desc": "Sun + day",
+      "category": "Time"
+    },
+    {
+      "name": "WHAT",
+      "en": "What",
+      "hi": "क्या",
+      "desc": "Palms up shrug",
+      "category": "Questions"
+    },
+    {
+      "name": "WHERE",
+      "en": "Where",
+      "hi": "कहाँ",
+      "desc": "Look around",
+      "category": "Questions"
+    },
+    {
+      "name": "WHEN",
+      "en": "When",
+      "hi": "कब",
+      "desc": "Point wrist",
+      "category": "Questions"
+    },
+    {
+      "name": "WHY",
+      "en": "Why",
+      "hi": "क्यों",
+      "desc": "Raise eyebrows",
+      "category": "Questions"
+    },
+    {
+      "name": "WHO",
+      "en": "Who",
+      "hi": "कौन",
+      "desc": "Circle around self",
+      "category": "Questions"
+    },
+    {
+      "name": "HOW",
+      "en": "How",
+      "hi": "कैसे",
+      "desc": "Palms up together",
+      "category": "Questions"
+    },
+    {
+      "name": "HOW_MUCH",
+      "en": "How Much",
+      "hi": "कितना",
+      "desc": "Hands apart",
+      "category": "Questions"
+    },
+    {
+      "name": "HOW_MANY",
+      "en": "How Many",
+      "hi": "कितने",
+      "desc": "Spread fingers",
+      "category": "Questions"
+    },
+    {
+      "name": "MOTHER",
+      "en": "Mother",
+      "hi": "माता",
+      "desc": "Tap chin",
+      "category": "Family"
+    },
+    {
+      "name": "FATHER",
+      "en": "Father",
+      "hi": "पिता",
+      "desc": "Tap forehead",
+      "category": "Family"
+    },
+    {
+      "name": "BROTHER",
+      "en": "Brother",
+      "hi": "भाई",
+      "desc": "Point + brother",
+      "category": "Family"
+    },
+    {
+      "name": "SISTER",
+      "en": "Sister",
+      "hi": "बहन",
+      "desc": "Point + sister",
+      "category": "Family"
+    },
+    {
+      "name": "SON",
+      "en": "Son",
+      "hi": "बेटा",
+      "desc": "Male + child",
+      "category": "Family"
+    },
+    {
+      "name": "DAUGHTER",
+      "en": "Daughter",
+      "hi": "बेटी",
+      "desc": "Female + child",
+      "category": "Family"
+    },
+    {
+      "name": "GRANDFATHER",
+      "en": "Grandfather",
+      "hi": "दादा",
+      "desc": "Old + father",
+      "category": "Family"
+    },
+    {
+      "name": "GRANDMOTHER",
+      "en": "Grandmother",
+      "hi": "दादी",
+      "desc": "Old + mother",
+      "category": "Family"
+    },
+    {
+      "name": "FRIEND",
+      "en": "Friend",
+      "hi": "दोस्त",
+      "desc": "Hook fingers",
+      "category": "Family"
+    },
+    {
+      "name": "HUSBAND",
+      "en": "Husband",
+      "hi": "पति",
+      "desc": "Ring + man",
+      "category": "Family"
+    },
+    {
+      "name": "WIFE",
+      "en": "Wife",
+      "hi": "पत्नी",
+      "desc": "Ring + woman",
+      "category": "Family"
+    },
+    {
+      "name": "CHILD",
+      "en": "Child",
+      "hi": "बच्चा",
+      "desc": "Hand at chest",
+      "category": "Family"
+    },
+    {
+      "name": "BABY",
+      "en": "Baby",
+      "hi": "बच्चा",
+      "desc": "Rock motion",
+      "category": "Family"
+    },
+    {
+      "name": "WOMAN",
+      "en": "Woman",
+      "hi": "महिला",
+      "desc": "Female feature",
+      "category": "Family"
+    },
+    {
+      "name": "MAN",
+      "en": "Man",
+      "hi": "आदमी",
+      "desc": "Male feature",
+      "category": "Family"
+    },
+    {
+      "name": "FOOD",
+      "en": "Food",
+      "hi": "खाना",
+      "desc": "Hand to mouth",
+      "category": "Food"
+    },
+    {
+      "name": "BREAD",
+      "en": "Bread",
+      "hi": "रोटी",
+      "desc": "Slicing motion",
+      "category": "Food"
+    },
+    {
+      "name": "RICE",
+      "en": "Rice",
+      "hi": "चावल",
+      "desc": "Pinching motion",
+      "category": "Food"
+    },
+    {
+      "name": "WATER",
+      "en": "Water",
+      "hi": "पानी",
+      "desc": "W sign",
+      "category": "Food"
+    },
+    {
+      "name": "MILK",
+      "en": "Milk",
+      "hi": "दूध",
+      "desc": "Milking motion",
+      "category": "Food"
+    },
+    {
+      "name": "TEA",
+      "en": "Tea",
+      "hi": "चाय",
+      "desc": "Cup motion",
+      "category": "Food"
+    },
+    {
+      "name": "APPLE",
+      "en": "Apple",
+      "hi": "सेब",
+      "desc": "Round + eat",
+      "category": "Food"
+    },
+    {
+      "name": "ORANGE",
+      "en": "Orange",
+      "hi": "नारंगी",
+      "desc": "Round + color",
+      "category": "Food"
+    },
+    {
+      "name": "MANGO",
+      "en": "Mango",
+      "hi": "आम",
+      "desc": "Hanging motion",
+      "category": "Food"
+    },
+    {
+      "name": "BANANA",
+      "en": "Banana",
+      "hi": "केला",
+      "desc": "C shape",
+      "category": "Food"
+    },
+    {
+      "name": "CHICKEN",
+      "en": "Chicken",
+      "hi": "मुर्गा",
+      "desc": "Pecking motion",
+      "category": "Food"
+    },
+    {
+      "name": "FISH",
+      "en": "Fish",
+      "hi": "मछली",
+      "desc": "Swimming motion",
+      "category": "Food"
+    },
+    {
+      "name": "MEAT",
+      "en": "Meat",
+      "hi": "मांस",
+      "desc": "Tearing motion",
+      "category": "Food"
+    },
+    {
+      "name": "SWEET",
+      "en": "Sweet",
+      "hi": "मीठा",
+      "desc": "Lick finger",
+      "category": "Food"
+    },
+    {
+      "name": "SALT",
+      "en": "Salt",
+      "hi": "नमक",
+      "desc": "Pinch motion",
+      "category": "Food"
+    },
+    {
+      "name": "SICK",
+      "en": "Sick",
+      "hi": "बीमार",
+      "desc": "Hand to head",
+      "category": "Health"
+    },
+    {
+      "name": "PAIN",
+      "en": "Pain",
+      "hi": "दर्द",
+      "desc": "Clutch area",
+      "category": "Health"
+    },
+    {
+      "name": "DOCTOR",
+      "en": "Doctor",
+      "hi": "डॉक्टर",
+      "desc": "Check pulse",
+      "category": "Health"
+    },
+    {
+      "name": "MEDICINE",
+      "en": "Medicine",
+      "hi": "दवा",
+      "desc": "Pill swallow",
+      "category": "Health"
+    },
+    {
+      "name": "HOSPITAL",
+      "en": "Hospital",
+      "hi": "अस्पताल",
+      "desc": "Cross arms",
+      "category": "Health"
+    },
+    {
+      "name": "FEVER",
+      "en": "Fever",
+      "hi": "बुखार",
+      "desc": "Head hot",
+      "category": "Health"
+    },
+    {
+      "name": "COUGH",
+      "en": "Cough",
+      "hi": "खांसी",
+      "desc": "Coughing motion",
+      "category": "Health"
+    },
+    {
+      "name": "COLD",
+      "en": "Cold",
+      "hi": "सर्दी",
+      "desc": "Shivering motion",
+      "category": "Health"
+    },
+    {
+      "name": "HEADACHE",
+      "en": "Headache",
+      "hi": "सिरदर्द",
+      "desc": "Head pain",
+      "category": "Health"
+    },
+    {
+      "name": "TOOTHACHE",
+      "en": "Toothache",
+      "hi": "दांत का दर्द",
+      "desc": "Tooth area",
+      "category": "Health"
+    },
+    {
+      "name": "HEALTHY",
+      "en": "Healthy",
+      "hi": "स्वस्थ",
+      "desc": "Muscle flex",
+      "category": "Health"
+    },
+    {
+      "name": "EXERCISE",
+      "en": "Exercise",
+      "hi": "व्यायाम",
+      "desc": "Fitness motion",
+      "category": "Health"
+    },
+    {
+      "name": "RED",
+      "en": "Red",
+      "hi": "लाल",
+      "desc": "R + color",
+      "category": "Colors"
+    },
+    {
+      "name": "BLUE",
+      "en": "Blue",
+      "hi": "नीला",
+      "desc": "B + color",
+      "category": "Colors"
+    },
+    {
+      "name": "GREEN",
+      "en": "Green",
+      "hi": "हरा",
+      "desc": "G + color",
+      "category": "Colors"
+    },
+    {
+      "name": "YELLOW",
+      "en": "Yellow",
+      "hi": "पीला",
+      "desc": "Y + color",
+      "category": "Colors"
+    },
+    {
+      "name": "WHITE",
+      "en": "White",
+      "hi": "सफेद",
+      "desc": "W + color",
+      "category": "Colors"
+    },
+    {
+      "name": "BLACK",
+      "en": "Black",
+      "hi": "काला",
+      "desc": "B + color",
+      "category": "Colors"
+    },
+    {
+      "name": "ORANGE",
+      "en": "Orange",
+      "hi": "नारंगी",
+      "desc": "O + color",
+      "category": "Colors"
+    },
+    {
+      "name": "PINK",
+      "en": "Pink",
+      "hi": "गुलाबी",
+      "desc": "P + color",
+      "category": "Colors"
+    },
+    {
+      "name": "PURPLE",
+      "en": "Purple",
+      "hi": "बैंगनी",
+      "desc": "P + color",
+      "category": "Colors"
+    },
+    {
+      "name": "BROWN",
+      "en": "Brown",
+      "hi": "भूरा",
+      "desc": "B + color",
+      "category": "Colors"
+    },
+    {
+      "name": "DOG",
+      "en": "Dog",
+      "hi": "कुत्ता",
+      "desc": "Barking motion",
+      "category": "Animals"
+    },
+    {
+      "name": "CAT",
+      "en": "Cat",
+      "hi": "बिल्ली",
+      "desc": "Whisker motion",
+      "category": "Animals"
+    },
+    {
+      "name": "BIRD",
+      "en": "Bird",
+      "hi": "पक्षी",
+      "desc": "Flying motion",
+      "category": "Animals"
+    },
+    {
+      "name": "FISH",
+      "en": "Fish",
+      "hi": "मछली",
+      "desc": "Swimming motion",
+      "category": "Animals"
+    },
+    {
+      "name": "HORSE",
+      "en": "Horse",
+      "hi": "घोड़ा",
+      "desc": "Galloping motion",
+      "category": "Animals"
+    },
+    {
+      "name": "COW",
+      "en": "Cow",
+      "hi": "गाय",
+      "desc": "Horn motion",
+      "category": "Animals"
+    },
+    {
+      "name": "ELEPHANT",
+      "en": "Elephant",
+      "hi": "हाथी",
+      "desc": "Trunk motion",
+      "category": "Animals"
+    },
+    {
+      "name": "LION",
+      "en": "Lion",
+      "hi": "शेर",
+      "desc": "Mane + roar",
+      "category": "Animals"
+    },
+    {
+      "name": "TIGER",
+      "en": "Tiger",
+      "hi": "बाघ",
+      "desc": "Stripe motion",
+      "category": "Animals"
+    },
+    {
+      "name": "MONKEY",
+      "en": "Monkey",
+      "hi": "बंदर",
+      "desc": "Scratching motion",
+      "category": "Animals"
+    },
+    {
+      "name": "WEATHER",
+      "en": "Weather",
+      "hi": "मौसम",
+      "desc": "Point up",
+      "category": "Weather"
+    },
+    {
+      "name": "SUN",
+      "en": "Sun",
+      "hi": "सूरज",
+      "desc": "Circle above",
+      "category": "Weather"
+    },
+    {
+      "name": "MOON",
+      "en": "Moon",
+      "hi": "चाँद",
+      "desc": "C shape",
+      "category": "Weather"
+    },
+    {
+      "name": "RAIN",
+      "en": "Rain",
+      "hi": "बारिश",
+      "desc": "Fingers down",
+      "category": "Weather"
+    },
+    {
+      "name": "SNOW",
+      "en": "Snow",
+      "hi": "बर्फ",
+      "desc": "Falling motion",
+      "category": "Weather"
+    },
+    {
+      "name": "WIND",
+      "en": "Wind",
+      "hi": "हवा",
+      "desc": "W motion",
+      "category": "Weather"
+    },
+    {
+      "name": "CLOUD",
+      "en": "Cloud",
+      "hi": "बादल",
+      "desc": "Cloud shape",
+      "category": "Weather"
+    },
+    {
+      "name": "LIGHTNING",
+      "en": "Lightning",
+      "hi": "बिजली",
+      "desc": "Zigzag down",
+      "category": "Weather"
+    },
+    {
+      "name": "THUNDER",
+      "en": "Thunder",
+      "hi": "गर्ज",
+      "desc": "Loud sound",
+      "category": "Weather"
+    },
+    {
+      "name": "COLD_WEATHER",
+      "en": "Cold",
+      "hi": "ठंडा",
+      "desc": "Shivering",
+      "category": "Weather"
+    },
+    {
+      "name": "HOT_WEATHER",
+      "en": "Hot",
+      "hi": "गर्म",
+      "desc": "Wipe forehead",
+      "category": "Weather"
+    },
+    {
+      "name": "CRICKET",
+      "en": "Cricket",
+      "hi": "क्रिकेट",
+      "desc": "Batting motion",
+      "category": "Sports"
+    },
+    {
+      "name": "FOOTBALL",
+      "en": "Football",
+      "hi": "फुटबॉल",
+      "desc": "Kicking motion",
+      "category": "Sports"
+    },
+    {
+      "name": "BASKETBALL",
+      "en": "Basketball",
+      "hi": "बास्केटबॉल",
+      "desc": "Throwing up",
+      "category": "Sports"
+    },
+    {
+      "name": "TENNIS",
+      "en": "Tennis",
+      "hi": "टेनिस",
+      "desc": "Racket motion",
+      "category": "Sports"
+    },
+    {
+      "name": "BADMINTON",
+      "en": "Badminton",
+      "hi": "बैडमिंटन",
+      "desc": "Shuttle motion",
+      "category": "Sports"
+    },
+    {
+      "name": "HOCKEY",
+      "en": "Hockey",
+      "hi": "हॉकी",
+      "desc": "Stick motion",
+      "category": "Sports"
+    },
+    {
+      "name": "SWIMMING",
+      "en": "Swimming",
+      "hi": "तैराकी",
+      "desc": "Swimming motion",
+      "category": "Sports"
+    },
+    {
+      "name": "RUNNING",
+      "en": "Running",
+      "hi": "दौड़ना",
+      "desc": "Running motion",
+      "category": "Sports"
+    },
+    {
+      "name": "CYCLING",
+      "en": "Cycling",
+      "hi": "साइकिल",
+      "desc": "Pedaling motion",
+      "category": "Sports"
+    },
+    {
+      "name": "BOXING",
+      "en": "Boxing",
+      "hi": "मुक्केबाजी",
+      "desc": "Punching motion",
+      "category": "Sports"
+    },
+    {
+      "name": "CHAIR",
+      "en": "Chair",
+      "hi": "कुर्सी",
+      "desc": "Sit down",
+      "category": "Objects"
+    },
+    {
+      "name": "TABLE",
+      "en": "Table",
+      "hi": "टेबल",
+      "desc": "Flat surface",
+      "category": "Objects"
+    },
+    {
+      "name": "DOOR",
+      "en": "Door",
+      "hi": "दरवाज़ा",
+      "desc": "Open motion",
+      "category": "Objects"
+    },
+    {
+      "name": "WINDOW",
+      "en": "Window",
+      "hi": "खिड़की",
+      "desc": "Open frame",
+      "category": "Objects"
+    },
+    {
+      "name": "BOOK",
+      "en": "Book",
+      "hi": "किताब",
+      "desc": "Open book",
+      "category": "Objects"
+    },
+    {
+      "name": "PEN",
+      "en": "Pen",
+      "hi": "कलम",
+      "desc": "Writing",
+      "category": "Objects"
+    },
+    {
+      "name": "PAPER",
+      "en": "Paper",
+      "hi": "कागज़",
+      "desc": "Flat motion",
+      "category": "Objects"
+    },
+    {
+      "name": "PHONE",
+      "en": "Phone",
+      "hi": "फोन",
+      "desc": "Phone to ear",
+      "category": "Objects"
+    },
+    {
+      "name": "CAR",
+      "en": "Car",
+      "hi": "कार",
+      "desc": "Steering motion",
+      "category": "Objects"
+    },
+    {
+      "name": "TRAIN",
+      "en": "Train",
+      "hi": "ट्रेन",
+      "desc": "Rail motion",
+      "category": "Objects"
+    },
+    {
+      "name": "BICYCLE",
+      "en": "Bicycle",
+      "hi": "साइकिल",
+      "desc": "Pedaling",
+      "category": "Objects"
+    },
+    {
+      "name": "PLANE",
+      "en": "Plane",
+      "hi": "हवाई जहाज",
+      "desc": "Flying motion",
+      "category": "Objects"
+    },
+    {
+      "name": "GIVE",
+      "en": "Give",
+      "hi": "देना",
+      "desc": "Giving motion",
+      "category": "Actions"
+    },
+    {
+      "name": "TAKE",
+      "en": "Take",
+      "hi": "लेना",
+      "desc": "Taking motion",
+      "category": "Actions"
+    },
+    {
+      "name": "SHOW",
+      "en": "Show",
+      "hi": "दिखाना",
+      "desc": "Pointing",
+      "category": "Actions"
+    },
+    {
+      "name": "HIDE",
+      "en": "Hide",
+      "hi": "छिपाना",
+      "desc": "Covering motion",
+      "category": "Actions"
+    },
+    {
+      "name": "OPEN",
+      "en": "Open",
+      "hi": "खोलना",
+      "desc": "Opening motion",
+      "category": "Actions"
+    },
+    {
+      "name": "CLOSE",
+      "en": "Close",
+      "hi": "बंद करना",
+      "desc": "Closing motion",
+      "category": "Actions"
+    },
+    {
+      "name": "PUSH",
+      "en": "Push",
+      "hi": "धक्का",
+      "desc": "Push motion",
+      "category": "Actions"
+    },
+    {
+      "name": "PULL",
+      "en": "Pull",
+      "hi": "खींचना",
+      "desc": "Pull motion",
+      "category": "Actions"
+    },
+    {
+      "name": "THROW",
+      "en": "Throw",
+      "hi": "फेंकना",
+      "desc": "Throwing motion",
+      "category": "Actions"
+    },
+    {
+      "name": "CATCH",
+      "en": "Catch",
+      "hi": "पकड़ना",
+      "desc": "Catching motion",
+      "category": "Actions"
+    },
+    {
+      "name": "CLIMB",
+      "en": "Climb",
+      "hi": "चढ़ना",
+      "desc": "Climbing motion",
+      "category": "Actions"
+    },
+    {
+      "name": "JUMP",
+      "en": "Jump",
+      "hi": "कूदना",
+      "desc": "Jumping motion",
+      "category": "Actions"
+    },
+    {
+      "name": "FALL",
+      "en": "Fall",
+      "hi": "गिरना",
+      "desc": "Falling motion",
+      "category": "Actions"
+    },
+    {
+      "name": "SIT",
+      "en": "Sit",
+      "hi": "बैठना",
+      "desc": "Sit motion",
+      "category": "Actions"
+    },
+    {
+      "name": "STAND",
+      "en": "Stand",
+      "hi": "खड़ा होना",
+      "desc": "Standing motion",
+      "category": "Actions"
+    },
+    {
+      "name": "CONTINUE",
+      "en": "Continue",
+      "hi": "जारी रखना",
+      "desc": "Moving forward",
+      "category": "Abstract"
+    },
+    {
+      "name": "STOP",
+      "en": "Stop",
+      "hi": "रुकना",
+      "desc": "Stop motion",
+      "category": "Abstract"
+    },
+    {
+      "name": "WAIT",
+      "en": "Wait",
+      "hi": "प्रतीक्षा",
+      "desc": "Waiting motion",
+      "category": "Abstract"
+    },
+    {
+      "name": "THINK",
+      "en": "Think",
+      "hi": "सोचना",
+      "desc": "Thinking gesture",
+      "category": "Abstract"
+    },
+    {
+      "name": "KNOW",
+      "en": "Know",
+      "hi": "जानना",
+      "desc": "Knowing gesture",
+      "category": "Abstract"
+    },
+    {
+      "name": "FORGET",
+      "en": "Forget",
+      "hi": "भूलना",
+      "desc": "Forgetting gesture",
+      "category": "Abstract"
+    },
+    {
+      "name": "BELIEVE",
+      "en": "Believe",
+      "hi": "मानना",
+      "desc": "Believing gesture",
+      "category": "Abstract"
+    },
+    {
+      "name": "UNDERSTAND",
+      "en": "Understand",
+      "hi": "समझना",
+      "desc": "Understanding gesture",
+      "category": "Abstract"
+    },
+    {
+      "name": "PROMISE",
+      "en": "Promise",
+      "hi": "वादा",
+      "desc": "Promise gesture",
+      "category": "Abstract"
+    }
+  ]
+}
