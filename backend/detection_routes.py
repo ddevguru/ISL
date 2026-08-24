@@ -8,6 +8,8 @@ import base64
 import cv2
 import numpy as np
 from pathlib import Path
+from PIL import Image, ImageOps
+from io import BytesIO
 
 detection_bp = Blueprint('detection', __name__, url_prefix='/api/detection')
 
@@ -95,8 +97,9 @@ def detect_from_frame():
         if isinstance(frame_data, str):
             try:
                 frame_bytes = base64.b64decode(frame_data)
-                nparr = np.frombuffer(frame_bytes, np.uint8)
-                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                image = Image.open(BytesIO(frame_bytes))
+                image = ImageOps.exif_transpose(image)
+                frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
             except Exception as e:
                 return jsonify({'error': f'Invalid frame data: {str(e)}'}), 400
         else:

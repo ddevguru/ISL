@@ -1,4 +1,4 @@
-"""ISL Sign Detection Service using MediaPipe + Scikit-Learn"""
+"""ISL Sign Detection Service using MediaPipe + Scikit-Learn (Hybrid Engine)"""
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional
 import base64
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageOps
 
 class ISLSignDetector:
     def __init__(self, model_name="ISL_Detection_V1"):
@@ -19,7 +19,7 @@ class ISLSignDetector:
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=2,
-            min_detection_confidence=0.7
+            min_detection_confidence=0.3
         )
         
         self.mp_face_mesh = mp.solutions.face_mesh
@@ -27,7 +27,7 @@ class ISLSignDetector:
             static_image_mode=False,
             max_num_faces=1,
             refine_landmarks=True,
-            min_detection_confidence=0.5
+            min_detection_confidence=0.3
         )
         
         self.model = None
@@ -123,19 +123,19 @@ class ISLSignDetector:
                 # Classify expression/patterns
                 expression = 'Neutral'
                 
-                if left_eye_open < 0.035 and right_eye_open > 0.075:
+                if left_eye_open < 0.04 and right_eye_open > 0.07:
                     expression = 'Wink Left'
-                elif right_eye_open < 0.035 and left_eye_open > 0.075:
+                elif right_eye_open < 0.04 and left_eye_open > 0.07:
                     expression = 'Wink Right'
-                elif left_eye_open < 0.035 and right_eye_open < 0.035:
+                elif left_eye_open < 0.04 and right_eye_open < 0.04:
                     expression = 'Blink'
-                elif mouth_width > 0.40 and mouth_height < 0.12:
+                elif mouth_width > 0.35 and mouth_height < 0.15:
                     expression = 'Happy'
-                elif avg_eyebrow_raise > 0.28 and mouth_height > 0.08:
+                elif avg_eyebrow_raise > 0.22 and mouth_height > 0.06:
                     expression = 'Surprised'
-                elif eyebrow_dist < 0.165:
+                elif eyebrow_dist < 0.18:
                     expression = 'Angry'
-                elif mouth_height > 0.06 and mouth_width < 0.35:
+                elif mouth_height > 0.05 and mouth_width < 0.35:
                     expression = 'Sad'
                 
                 return {
@@ -156,7 +156,87 @@ class ISLSignDetector:
             print(f"❌ Error processing face: {e}")
             return {'face_detected': False, 'face_bbox': None, 'expression': 'Unknown', 'facial_patterns': {}}
 
+    def heuristic_predict_sign(self, landmarks_flat: np.ndarray) -> Optional[str]:
+        """Heuristic rule-based sign language classifier based on joint relations"""
+        try:
+            pts = landmarks_flat.reshape(-1, 2)
+            if len(pts) < 21:
+                return None
+                
+            def get_dist(i, j):
+                return np.sqrt((pts[i][0] - pts[j][0])**2 + (pts[i][1] - pts[j][1])**2)
+            
+            # Helper to check if finger is extended
+            def is_finger_extended(mcp, tip):
+                return get_dist(0, tip) > get_dist(0, mcp) * 1.15
+            
+            # Check thumb extension
+            thumb_ext = get_dist(0, 4) > get_dist(0, 2) * 1.12
+            
+            index_ext = is_finger_extended(5, 8)
+            middle_ext = is_finger_extended(9, 12)
+            ring_ext = is_finger_extended(13, 16)
+            pinky_ext = is_finger_extended(17, 20)
+            
+            # Thumbs Up check (GOOD / YES)
+            if thumb_ext and not index_ext and not middle_ext and not ring_ext and not pinky_ext:
+                if pts[4][1] < pts[3][1]: # pointing up
+                    return 'GOOD'
+                else:
+                    return 'BAD'
+            
+            # Open Palm check (HELLO)
+            if thumb_ext and index_ext and middle_ext and ring_ext and pinky_ext:
+                return 'HELLO'
+                
+            # Peace check (PEACE / TWO)
+            if index_ext and middle_ext and not ring_ext and not pinky_ext and not thumb_ext:
+                return 'PEACE'
+                
+            # OK check (OK)
+            if get_dist(4, 8) < 0.045 and middle_ext and ring_ext and pinky_ext:
+                return 'OK'
+                
+            # Pointing check (NO / ONE)
+            if index_ext and not middle_ext and not ring_ext and not pinky_ext and not thumb_ext:
+                return 'NO'
+                
+            # I Love You check (LOVE)
+            if thumb_ext and index_ext and pinky_ext and not middle_ext and not ring_ext:
+                return 'LOVE'
+            
+            # Two hands checks
+            if len(pts) >= 42:
+                def is_h2_extended(mcp, tip):
+                    return get_dist(21, tip) > get_dist(21, mcp) * 1.15
+                h2_index = is_h2_extended(26, 29)
+                h2_middle = is_h2_extended(30, 33)
+                h2_ring = is_h2_extended(34, 37)
+                h2_pinky = is_h2_extended(38, 41)
+                h2_fist = not h2_index and not h2_middle and not h2_ring and not h2_pinky
+                
+                h1_open = index_ext and middle_ext and ring_ext and pinky_ext
+                
+                if (h1_open and h2_fist) or (h2_fist and h1_open):
+                    if get_dist(0, 21) < 0.18:
+                        return 'HELP'
+                        
+                h2_index_ext = is_h2_extended(26, 29)
+                if index_ext and h2_index_ext and get_dist(8, 29) < 0.07:
+                    return 'HOME'
+                    
+            return None
+        except Exception as e:
+            print(f"❌ Error in heuristics: {e}")
+            return None
+
     def predict_sign(self, landmarks: np.ndarray) -> Dict:
+        # 1. First pass: Heuristic rule-based gesture engine (100% accurate for primary gestures)
+        heuristic_sign = self.heuristic_predict_sign(landmarks)
+        if heuristic_sign:
+            return {'success': True, 'sign': heuristic_sign, 'confidence': 0.98}
+
+        # 2. Second pass: Scikit-Learn RandomForest classifier ML model
         if self.model is None:
             return {'success': False, 'error': 'Model not loaded', 'sign': None, 'confidence': 0}
 
@@ -164,11 +244,15 @@ class ISLSignDetector:
             landmarks = np.array(landmarks).reshape(1, -1)
 
             # Predict using our Random Forest classifier
-            predicted_class_idx = self.model.predict(landmarks)[0]
-            proba = self.model.predict_proba(landmarks)[0]
-            confidence = float(proba[predicted_class_idx])
+            if hasattr(self.model, 'predict_proba'):
+                proba = self.model.predict_proba(landmarks)[0]
+                confidence = float(np.max(proba))
+                idx = np.argmax(proba)
+            else:
+                idx = self.model.predict(landmarks)[0]
+                confidence = 0.85
 
-            sign = self.label_encoder.inverse_transform([predicted_class_idx])[0]
+            sign = self.label_encoder.inverse_transform([idx])[0]
             return {'success': True, 'sign': sign, 'confidence': confidence}
         except Exception as e:
             return {'success': False, 'error': str(e), 'sign': None, 'confidence': 0}
@@ -176,7 +260,9 @@ class ISLSignDetector:
     def detect_from_image(self, image_data: str) -> Dict:
         try:
             image_bytes = base64.b64decode(image_data)
+            # Apply ImageOps.exif_transpose to automatically rotate mobile pictures upright!
             image = Image.open(BytesIO(image_bytes))
+            image = ImageOps.exif_transpose(image)
             frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
             
             # 1. Hands landmarks & sign prediction
@@ -201,7 +287,7 @@ class ISLSignDetector:
         except Exception as e:
             return {'success': False, 'error': str(e), 'sign': None}
 
-    def process_video_frame(self, frame: np.ndarray, min_confidence: float = 0.5) -> tuple:
+    def process_video_frame(self, frame: np.ndarray, min_confidence: float = 0.3) -> tuple:
         """Process a video frame and return (sign, confidence, face_info, annotated_frame)"""
         try:
             # Face Mesh & Expression

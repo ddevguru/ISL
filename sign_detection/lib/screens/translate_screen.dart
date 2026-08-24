@@ -100,7 +100,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
         },
         body: jsonEncode({
           'frame': base64Image,
-          'min_confidence': 0.4
+          'min_confidence': 0.2
         }),
       ).timeout(const Duration(seconds: 5));
 
@@ -116,7 +116,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
             _faceBbox = data['face_bbox'];
             _expression = data['expression'] ?? 'Unknown';
 
-            if (_detectedSign != 'Unknown' && _confidence > 0.4) {
+            if (_detectedSign != 'Unknown' && _confidence > 0.2) {
               // Add to history only if a valid sign is detected
               final existingIndex = _detectionHistory.indexWhere((h) => h['sign'] == _detectedSign);
               if (existingIndex != -1) {

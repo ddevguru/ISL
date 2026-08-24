@@ -16,9 +16,9 @@ class LearnScreen extends StatefulWidget {
 
 class _LearnScreenState extends State<LearnScreen> {
   String selectedLanguage = 'en';
-  String selectedCategory = 'Greetings';
+  String selectedCategory = 'ALL';
   List<Map<String, dynamic>> signs = [];
-  List<String> categories = ['Greetings', 'Response', 'Emotions', 'Actions', 'Objects', 'Adjectives', 'Family', 'Requests', 'Time', 'Numbers'];
+  List<String> categories = ['ALL', 'Greetings', 'Response', 'Emotions', 'Actions', 'Objects', 'Adjectives', 'Family', 'Requests', 'Time', 'Numbers'];
   Map<String, dynamic> learningStats = {};
   bool isLoading = false;
 
@@ -33,7 +33,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final authService = context.read<AuthService>();
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/learning/categories'),
+        Uri.parse(ApiConfig.categoriesEndpoint),
         headers: {
           ...ApiConfig.defaultHeaders,
           'Authorization': 'Bearer ${authService.accessToken}',
@@ -45,10 +45,7 @@ class _LearnScreenState extends State<LearnScreen> {
         final catsList = data['categories'] as List?;
         if (catsList != null && catsList.isNotEmpty) {
           setState(() {
-            categories = List<String>.from(catsList);
-            if (!categories.contains(selectedCategory)) {
-              selectedCategory = categories[0];
-            }
+            categories = ['ALL', ...List<String>.from(catsList)];
           });
         }
       }
@@ -64,8 +61,12 @@ class _LearnScreenState extends State<LearnScreen> {
     setState(() => isLoading = true);
 
     try {
+      final String url = selectedCategory == 'ALL'
+          ? '${ApiConfig.signsEndpoint}?per_page=100'
+          : '${ApiConfig.signsEndpoint}?category=$selectedCategory&per_page=100';
+
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/learning/signs?category=$selectedCategory'),
+        Uri.parse(url),
         headers: {
           ...ApiConfig.defaultHeaders,
           'Authorization': 'Bearer ${authService.accessToken}',
@@ -90,7 +91,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final authService = context.read<AuthService>();
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/learning/progress'),
+        Uri.parse('${ApiConfig.learningProgressEndpoint}/summary'),
         headers: {
           ...ApiConfig.defaultHeaders,
           'Authorization': 'Bearer ${authService.accessToken}',
@@ -99,7 +100,7 @@ class _LearnScreenState extends State<LearnScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        setState(() => learningStats = data['stats'] ?? {});
+        setState(() => learningStats = data['summary'] ?? data['stats'] ?? {});
       }
     } catch (e) {
       print('Error loading progress: $e');
@@ -187,12 +188,12 @@ class _LearnScreenState extends State<LearnScreen> {
               
               const SizedBox(height: 20),
               const Text(
-                'How to make this sign:',
+                'How to perform gesture:',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
               ),
               const SizedBox(height: 6),
               Text(
-                sign['description'] ?? 'No description available.',
+                sign['description'] ?? 'Position your hand as illustrated in the vector diagram.',
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
               const SizedBox(height: 24),
@@ -235,8 +236,8 @@ class _LearnScreenState extends State<LearnScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final practicedCount = learningStats['total_signs_practiced'] ?? 0;
-    final masteredCount = learningStats['mastered_signs'] ?? 0;
+    final practicedCount = learningStats['total_signs_practiced'] ?? learningStats['practiced_signs'] ?? 0;
+    final masteredCount = learningStats['mastered_signs'] ?? learningStats['total_mastered'] ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -269,13 +270,26 @@ class _LearnScreenState extends State<LearnScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Practice Progress 🎯',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Practice Progress 🎯',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Total Signs: ${signs.length}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Row(
