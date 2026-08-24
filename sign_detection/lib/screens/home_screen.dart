@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LiveTranslationScreen(),
+                                builder: (context) => const TranslateScreen(),
                               ),
                             );
                           },
@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LiveTranslationScreen(),
+                              builder: (context) => const TranslateScreen(),
                             ),
                           );
                         },

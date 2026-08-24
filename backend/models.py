@@ -84,6 +84,7 @@ class Sign(db.Model):
             'description': self.description,
             'video_path': self.video_path,
             'image_path': self.image_path,
+            'keypoints_data': self.keypoints_data,
             'category': self.category,
             'difficulty_level': self.difficulty_level,
             'dataset_source': self.dataset_source,

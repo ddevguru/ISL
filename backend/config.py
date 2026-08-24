@@ -69,10 +69,13 @@ class ProductionConfig(Config):
         'pool_recycle': 1800,
         'pool_pre_ping': True,
         'max_overflow': 10,
-        'connect_args': {
+    }
+    
+    # Only add sslmode if we are actually using a PostgreSQL database
+    if SQLALCHEMY_DATABASE_URI.startswith('postgresql://'):
+        SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {
             'sslmode': 'allow',
         }
-    }
 
 
 class TestingConfig(Config):

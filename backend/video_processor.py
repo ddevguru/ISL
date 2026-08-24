@@ -46,7 +46,7 @@ class VideoProcessor:
                 if not ret:
                     break
 
-                sign, confidence, annotated_frame = detector.process_video_frame(
+                sign, confidence, face_res, annotated_frame = detector.process_video_frame(
                     frame, min_confidence
                 )
 
@@ -55,7 +55,9 @@ class VideoProcessor:
                         'frame': frame_number,
                         'timestamp': frame_number / fps,
                         'sign': sign,
-                        'confidence': float(confidence)
+                        'confidence': float(confidence),
+                        'face_detected': face_res.get('face_detected', False),
+                        'expression': face_res.get('expression', 'Unknown')
                     })
 
                 if out:
@@ -91,7 +93,7 @@ class VideoProcessor:
     def process_camera_frame(self, frame, min_confidence=0.5):
         try:
             detector = self._get_detector()
-            sign, confidence, annotated_frame = detector.process_video_frame(
+            sign, confidence, face_res, annotated_frame = detector.process_video_frame(
                 frame, min_confidence
             )
 
@@ -99,7 +101,11 @@ class VideoProcessor:
                 'sign': sign,
                 'confidence': float(confidence) if confidence else 0.0,
                 'frame': annotated_frame,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.utcnow().isoformat(),
+                'face_detected': face_res.get('face_detected', False),
+                'face_bbox': face_res.get('face_bbox'),
+                'expression': face_res.get('expression', 'Unknown'),
+                'facial_patterns': face_res.get('facial_patterns', {})
             }
 
             if sign and confidence >= min_confidence:
@@ -134,7 +140,9 @@ class VideoProcessor:
                         'frame': frame_bytes,
                         'sign': result['sign'],
                         'confidence': result['confidence'],
-                        'timestamp': result['timestamp']
+                        'timestamp': result['timestamp'],
+                        'face_detected': result.get('face_detected', False),
+                        'expression': result.get('expression', 'Unknown')
                     }
 
             cap.release()

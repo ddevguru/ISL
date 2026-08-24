@@ -104,7 +104,6 @@ class DatasetLoader:
             {'name': 'Thank You', 'english_translation': 'Thank You / Thanks', 'hindi_translation': 'धन्यवाद', 'description': 'Hand touching chest and moving forward', 'category': 'Requests', 'difficulty_level': 'easy', 'dataset_source': 'ISL'},
             {'name': 'Sorry', 'english_translation': 'Sorry / Apology', 'hindi_translation': 'माफी', 'description': 'Hand on chest with sorry expression', 'category': 'Requests', 'difficulty_level': 'medium', 'dataset_source': 'ISL'},
             {'name': 'Excuse Me', 'english_translation': 'Excuse Me', 'hindi_translation': 'माफ कीजिए', 'description': 'Hand gesture seeking attention', 'category': 'Requests', 'difficulty_level': 'medium', 'dataset_source': 'ISL'},
-            {'name': 'Help', 'english_translation': 'Help / Assist', 'hindi_translation': 'मदद', 'description': 'Hand under fist lifting up', 'category': 'Requests', 'difficulty_level': 'medium', 'dataset_source': 'ISL'},
 
             # Education & Cognition
             {'name': 'Learn', 'english_translation': 'Learn / Study', 'hindi_translation': 'सीखना', 'description': 'Hand to head then to open palm', 'category': 'Education', 'difficulty_level': 'medium', 'dataset_source': 'ISL'},
@@ -135,6 +134,79 @@ class DatasetLoader:
 
         return dataset
 
+    def generate_hand_landmarks(self, sign_name):
+        """Generate simulated 2D hand skeleton points (21 landmarks) for visualization"""
+        name = sign_name.upper()
+
+        # Default open hand (HELLO) template normalized coordinates
+        wrist = [0.5, 0.85]
+        thumb = [[0.4, 0.8], [0.32, 0.74], [0.26, 0.7], [0.2, 0.68]]
+        index = [[0.43, 0.6], [0.4, 0.48], [0.38, 0.39], [0.36, 0.3]]
+        middle = [[0.5, 0.58], [0.5, 0.44], [0.5, 0.34], [0.5, 0.24]]
+        ring = [[0.57, 0.6], [0.6, 0.48], [0.62, 0.39], [0.64, 0.3]]
+        pinky = [[0.63, 0.64], [0.67, 0.55], [0.7, 0.48], [0.72, 0.41]]
+
+        if name in ['GOOD', 'YES', 'AGREE', 'STRONG', 'HEALTH']:  # Thumbs Up
+            thumb = [[0.4, 0.8], [0.34, 0.74], [0.32, 0.62], [0.32, 0.52]]
+            index = [[0.43, 0.6], [0.44, 0.64], [0.43, 0.66], [0.44, 0.65]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name in ['BAD', 'WEAK', 'UGLY']:  # Thumbs Down
+            thumb = [[0.4, 0.8], [0.34, 0.86], [0.32, 0.94], [0.32, 0.98]]
+            index = [[0.43, 0.6], [0.44, 0.64], [0.43, 0.66], [0.44, 0.65]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name in ['PEACE', 'TWO', 'WALK', 'RUN', 'JUMP', 'DANCE', 'THREE']:  # Peace Sign
+            thumb = [[0.4, 0.8], [0.36, 0.76], [0.38, 0.72], [0.42, 0.7]]
+            index = [[0.43, 0.6], [0.38, 0.46], [0.34, 0.34], [0.3, 0.22]]
+            middle = [[0.5, 0.58], [0.5, 0.44], [0.5, 0.32], [0.5, 0.2]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name in ['OK', 'UNDERSTAND', 'LISTEN']:  # OK Sign
+            thumb = [[0.4, 0.8], [0.32, 0.76], [0.34, 0.68], [0.38, 0.62]]
+            index = [[0.43, 0.6], [0.4, 0.54], [0.38, 0.58], [0.38, 0.62]]
+            middle = [[0.5, 0.58], [0.5, 0.44], [0.5, 0.34], [0.5, 0.24]]
+            ring = [[0.57, 0.6], [0.6, 0.48], [0.62, 0.39], [0.64, 0.3]]
+            pinky = [[0.63, 0.64], [0.67, 0.55], [0.7, 0.48], [0.72, 0.41]]
+        elif name in ['NO', 'ONE', 'THINK', 'LOOK', 'REMEMBER', 'FORGET', 'LEARN', 'WRITE', 'CLOCK']:  # Index point up
+            thumb = [[0.4, 0.8], [0.36, 0.76], [0.38, 0.72], [0.42, 0.7]]
+            index = [[0.43, 0.6], [0.4, 0.46], [0.38, 0.36], [0.36, 0.25]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name in ['LOVE', 'FRIEND', 'BEAUTIFUL', 'PHONE']:  # Love Sign
+            thumb = [[0.4, 0.8], [0.32, 0.76], [0.24, 0.72], [0.18, 0.7]]
+            index = [[0.43, 0.6], [0.4, 0.46], [0.38, 0.36], [0.36, 0.25]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.67, 0.54], [0.7, 0.47], [0.72, 0.4]]
+        elif name in ['FIST', 'SORRY', 'ANGRY', 'SCARED', 'WORK', 'PAIN', 'SIT', 'COLD', 'DIRTY', 'BABY', 'SICK', 'TAKE', 'WATER', 'FOOD', 'CAR', 'MONEY', 'DOCTOR']:
+            # Fist shape
+            thumb = [[0.4, 0.8], [0.36, 0.76], [0.38, 0.72], [0.42, 0.7]]
+            index = [[0.43, 0.6], [0.44, 0.64], [0.43, 0.66], [0.44, 0.65]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name == 'HELP':
+            # Fist resting on palm (represented as fist here)
+            thumb = [[0.4, 0.8], [0.36, 0.76], [0.38, 0.72], [0.42, 0.7]]
+            index = [[0.43, 0.6], [0.44, 0.64], [0.43, 0.66], [0.44, 0.65]]
+            middle = [[0.5, 0.58], [0.5, 0.62], [0.5, 0.64], [0.5, 0.63]]
+            ring = [[0.57, 0.6], [0.56, 0.64], [0.57, 0.66], [0.56, 0.65]]
+            pinky = [[0.63, 0.64], [0.62, 0.68], [0.63, 0.7], [0.62, 0.69]]
+        elif name in ['HOME', 'HOUSE', 'SCHOOL', 'HOSPITAL']:
+            # Tilted roof shape
+            thumb = [[0.4, 0.8], [0.34, 0.76], [0.28, 0.72], [0.22, 0.7]]
+            index = [[0.43, 0.6], [0.38, 0.52], [0.34, 0.45], [0.3, 0.38]]
+            middle = [[0.5, 0.58], [0.46, 0.48], [0.42, 0.4], [0.38, 0.32]]
+            ring = [[0.57, 0.6], [0.53, 0.52], [0.49, 0.45], [0.45, 0.38]]
+            pinky = [[0.63, 0.64], [0.59, 0.58], [0.55, 0.52], [0.51, 0.46]]
+
+        points = [wrist] + thumb + index + middle + ring + pinky
+        return [{'x': p[0], 'y': p[1]} for p in points]
+
     def insert_signs_into_db(self):
         try:
             dataset = self.load_sign_language_dataset()
@@ -142,7 +214,14 @@ class DatasetLoader:
             for sign_data in dataset:
                 existing = Sign.query.filter_by(name=sign_data['name']).first()
 
-                if not existing:
+                if existing:
+                    existing.keypoints_data = self.generate_hand_landmarks(sign_data['name'])
+                    existing.english_translation = sign_data['english_translation']
+                    existing.hindi_translation = sign_data.get('hindi_translation')
+                    existing.description = sign_data.get('description')
+                    existing.category = sign_data.get('category')
+                    existing.difficulty_level = sign_data.get('difficulty_level')
+                else:
                     sign = Sign(
                         name=sign_data['name'],
                         english_translation=sign_data['english_translation'],
@@ -151,13 +230,13 @@ class DatasetLoader:
                         category=sign_data.get('category'),
                         difficulty_level=sign_data.get('difficulty_level'),
                         dataset_source=sign_data.get('dataset_source'),
-                        confidence_score=random.uniform(0.85, 0.99)
+                        confidence_score=random.uniform(0.85, 0.99),
+                        keypoints_data=self.generate_hand_landmarks(sign_data['name'])
                     )
-
                     db.session.add(sign)
 
             db.session.commit()
-            return len(dataset), "Dataset loaded successfully"
+            return len(dataset), "Dataset loaded and updated successfully"
 
         except Exception as e:
             db.session.rollback()

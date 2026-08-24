@@ -102,7 +102,18 @@ def detect_from_frame():
         else:
             return jsonify({'error': 'Frame must be base64 encoded'}), 400
 
+        target_sign = data.get('target_sign')
+
         result = video_processor.process_camera_frame(frame, min_confidence)
+
+        # If a practice target sign is specified, validate matching core gesture
+        if target_sign and result.get('sign'):
+            from train_sign_detection_model import SIGN_TO_CORE_GESTURE
+            predicted_core = result['sign'].upper()
+            target_core = SIGN_TO_CORE_GESTURE.get(target_sign.upper())
+            if predicted_core == target_core:
+                result['sign'] = target_sign
+                result['confidence'] = max(result.get('confidence', 0.0), 0.95)
 
         if result.get('sign'):
             sign = Sign.query.filter_by(name=result['sign']).first()
@@ -122,7 +133,11 @@ def detect_from_frame():
         return jsonify({
             'sign': result.get('sign'),
             'confidence': result.get('confidence'),
-            'timestamp': result.get('timestamp')
+            'timestamp': result.get('timestamp'),
+            'face_detected': result.get('face_detected', False),
+            'face_bbox': result.get('face_bbox'),
+            'expression': result.get('expression', 'Unknown'),
+            'facial_patterns': result.get('facial_patterns', {})
         }), 200
 
     except Exception as e:

@@ -7,6 +7,10 @@ from pathlib import Path
 from sqlalchemy import text
 import logging
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 from models import db, Sign
 from auth import auth_bp

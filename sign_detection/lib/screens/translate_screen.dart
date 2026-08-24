@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:image/image.dart' as img;
 import 'dart:convert';
+import 'dart:async';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../config/api_config.dart';
@@ -17,10 +17,16 @@ class TranslateScreen extends StatefulWidget {
 class _TranslateScreenState extends State<TranslateScreen> {
   CameraController? _cameraController;
   List<CameraDescription>? cameras;
+  Timer? _frameTimer;
   bool _isDetecting = false;
   String _detectedSign = 'No sign detected';
   double _confidence = 0.0;
   List<Map<String, dynamic>> _detectionHistory = [];
+  
+  // Face detection variables
+  bool _faceDetected = false;
+  Map<String, dynamic>? _faceBbox;
+  String _expression = 'Unknown';
 
   @override
   void initState() {
@@ -32,8 +38,14 @@ class _TranslateScreenState extends State<TranslateScreen> {
     try {
       cameras = await availableCameras();
       if (cameras != null && cameras!.isNotEmpty) {
+        // Use front camera for self-signing and face detection
+        final frontCamera = cameras!.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front,
+          orElse: () => cameras![0],
+        );
+
         _cameraController = CameraController(
-          cameras![0],
+          frontCamera,
           ResolutionPreset.medium,
           enableAudio: false,
         );
@@ -42,7 +54,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
 
         if (mounted) {
           setState(() {});
-          _startDetection();
+          _startDetectionTimer();
         }
       }
     } catch (e) {
@@ -50,52 +62,31 @@ class _TranslateScreenState extends State<TranslateScreen> {
     }
   }
 
-  void _startDetection() {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return;
-    }
+  void _startDetectionTimer() {
+    _frameTimer = Timer.periodic(const Duration(milliseconds: 800), (timer) async {
+      if (_isDetecting || _cameraController == null || !_cameraController!.value.isInitialized) {
+        return;
+      }
 
-    _cameraController!.startImageStream((CameraImage image) async {
-      if (_isDetecting) return;
-
-      _isDetecting = true;
+      setState(() => _isDetecting = true);
 
       try {
-        // Convert CameraImage to base64
-        final bytes = await _convertCameraImage(image);
+        // Capture frame as JPEG picture (robust & works on all devices without YUV corruptions)
+        final imageFile = await _cameraController!.takePicture();
+        final bytes = await imageFile.readAsBytes();
         final base64Image = base64Encode(bytes);
 
         // Send to backend for detection
         await _detectSign(base64Image);
       } catch (e) {
-        print('Detection error: $e');
+        print('Frame capture/detection error: $e');
       } finally {
-        _isDetecting = false;
+        if (mounted) {
+          setState(() => _isDetecting = false);
+        }
       }
     });
   }
-
-  Future<List<int>> _convertCameraImage(CameraImage image) async {
-    final planes = image.planes;
-    final buffer = planes[0].bytes;
-
-    try {
-      // Create image from raw bytes using a simpler method
-      final image16 = img.Image.fromBytes(
-        width: image.width,
-        height: image.height,
-        bytes: buffer.buffer,
-        format: img.Format.uint8,
-      );
-
-      return img.encodeJpg(image16);
-    } catch (e) {
-      print('Image conversion error: $e');
-      // Fallback: just return the bytes as-is
-      return buffer;
-    }
-  }
-
 
   Future<void> _detectSign(String base64Image) async {
     try {
@@ -107,8 +98,11 @@ class _TranslateScreenState extends State<TranslateScreen> {
           ...ApiConfig.defaultHeaders,
           'Authorization': 'Bearer ${authService.accessToken}',
         },
-        body: jsonEncode({'frame': base64Image}),
-      ).timeout(const Duration(seconds: 10));
+        body: jsonEncode({
+          'frame': base64Image,
+          'min_confidence': 0.4
+        }),
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -117,15 +111,28 @@ class _TranslateScreenState extends State<TranslateScreen> {
           setState(() {
             _detectedSign = data['sign'] ?? 'Unknown';
             _confidence = (data['confidence'] ?? 0.0).toDouble();
+            
+            _faceDetected = data['face_detected'] ?? false;
+            _faceBbox = data['face_bbox'];
+            _expression = data['expression'] ?? 'Unknown';
 
-            _detectionHistory.insert(0, {
-              'sign': _detectedSign,
-              'confidence': _confidence,
-              'timestamp': DateTime.now(),
-            });
+            if (_detectedSign != 'Unknown' && _confidence > 0.4) {
+              // Add to history only if a valid sign is detected
+              final existingIndex = _detectionHistory.indexWhere((h) => h['sign'] == _detectedSign);
+              if (existingIndex != -1) {
+                _detectionHistory.removeAt(existingIndex);
+              }
+              
+              _detectionHistory.insert(0, {
+                'sign': _detectedSign,
+                'confidence': _confidence,
+                'expression': _expression,
+                'timestamp': DateTime.now(),
+              });
 
-            if (_detectionHistory.length > 10) {
-              _detectionHistory.removeLast();
+              if (_detectionHistory.length > 10) {
+                _detectionHistory.removeLast();
+              }
             }
           });
         }
@@ -135,29 +142,41 @@ class _TranslateScreenState extends State<TranslateScreen> {
     }
   }
 
-  void _captureFrame() async {
-    try {
-      final image = await _cameraController!.takePicture();
-      print('Frame captured: ${image.path}');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Frame captured! Processing...')),
-      );
-    } catch (e) {
-      print('Error capturing frame: $e');
-    }
-  }
-
   void _clearHistory() {
     setState(() {
       _detectionHistory.clear();
       _detectedSign = 'No sign detected';
       _confidence = 0.0;
+      _faceDetected = false;
+      _faceBbox = null;
+      _expression = 'Unknown';
     });
+  }
+
+  String _getExpressionEmoji(String expression) {
+    switch (expression.toLowerCase()) {
+      case 'happy':
+        return '😊';
+      case 'sad':
+        return '😢';
+      case 'surprised':
+        return '😲';
+      case 'angry':
+        return '😠';
+      case 'wink left':
+      case 'wink right':
+        return '😜';
+      case 'blink':
+        return '😴';
+      case 'neutral':
+      default:
+        return '😐';
+    }
   }
 
   @override
   void dispose() {
+    _frameTimer?.cancel();
     _cameraController?.dispose();
     super.dispose();
   }
@@ -181,15 +200,81 @@ class _TranslateScreenState extends State<TranslateScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Camera Preview
+            // Camera Preview & Face Box Overlay
             Container(
               width: double.infinity,
-              height: 300,
+              height: 350,
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(color: Colors.deepPurple, width: 2),
               ),
-              child: CameraPreview(_cameraController!),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: CameraPreview(_cameraController!),
+                  ),
+                  if (_faceDetected && _faceBbox != null)
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final w = constraints.maxWidth;
+                        final h = constraints.maxHeight;
+                        
+                        final boxX = _faceBbox!['x'] * w;
+                        final boxY = _faceBbox!['y'] * h;
+                        final boxW = _faceBbox!['w'] * w;
+                        final boxH = _faceBbox!['h'] * h;
+                        
+                        return Positioned(
+                          left: boxX,
+                          top: boxY,
+                          width: boxW,
+                          height: boxH,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.green, width: 3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                color: Colors.green,
+                                child: Text(
+                                  _expression,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  if (_isDetecting)
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
 
             // Detection Result
@@ -242,6 +327,28 @@ class _TranslateScreenState extends State<TranslateScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    
+                    // Expression Display
+                    if (_faceDetected) ...[
+                      const Divider(height: 24, thickness: 1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Face Expression: ',
+                            style: TextStyle(fontSize: 14, color: Colors.black54),
+                          ),
+                          Text(
+                            '${_getExpressionEmoji(_expression)} $_expression',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]
                   ],
                 ),
               ),
@@ -254,12 +361,32 @@ class _TranslateScreenState extends State<TranslateScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: _captureFrame,
-                      icon: const Icon(Icons.camera),
-                      label: const Text('Capture'),
+                      onPressed: () {
+                        // Toggle detection
+                        if (_frameTimer != null && _frameTimer!.isActive) {
+                          _frameTimer?.cancel();
+                          setState(() {
+                            _detectedSign = 'Detection paused';
+                            _confidence = 0.0;
+                          });
+                        } else {
+                          _startDetectionTimer();
+                        }
+                      },
+                      icon: Icon(
+                        _frameTimer != null && _frameTimer!.isActive
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                      ),
+                      label: Text(
+                        _frameTimer != null && _frameTimer!.isActive
+                            ? 'Pause'
+                            : 'Resume',
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
                         padding: const EdgeInsets.symmetric(vertical: 12),
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ),
@@ -272,6 +399,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         padding: const EdgeInsets.symmetric(vertical: 12),
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ),
@@ -296,6 +424,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
                   if (_detectionHistory.isEmpty)
                     Container(
                       padding: const EdgeInsets.all(20),
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(10),
@@ -333,7 +462,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
                                     ),
                                   ),
                                   Text(
-                                    'Confidence: ${(item['confidence'] * 100).toStringAsFixed(1)}%',
+                                    'Confidence: ${(item['confidence'] * 100).toStringAsFixed(1)}%  •  ${item['expression']}',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey.shade600,
@@ -342,7 +471,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
                                 ],
                               ),
                               Text(
-                                '${item['timestamp'].hour}:${item['timestamp'].minute}',
+                                '${item['timestamp'].hour.toString().padLeft(2, '0')}:${item['timestamp'].minute.toString().padLeft(2, '0')}:${item['timestamp'].second.toString().padLeft(2, '0')}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade600,
