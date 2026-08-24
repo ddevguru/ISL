@@ -16,18 +16,20 @@ class ISLSignDetector:
         self.models_dir = Path('models')
         
         self.mp_hands = mp.solutions.hands
+        # static_image_mode=True is required for still frame API processing!
         self.hands = self.mp_hands.Hands(
-            static_image_mode=False,
+            static_image_mode=True,
             max_num_hands=2,
-            min_detection_confidence=0.3
+            min_detection_confidence=0.2
         )
         
         self.mp_face_mesh = mp.solutions.face_mesh
+        # static_image_mode=True is required for still frame API processing!
         self.face_mesh = self.mp_face_mesh.FaceMesh(
-            static_image_mode=False,
+            static_image_mode=True,
             max_num_faces=1,
             refine_landmarks=True,
-            min_detection_confidence=0.3
+            min_detection_confidence=0.2
         )
         
         self.model = None
@@ -168,10 +170,10 @@ class ISLSignDetector:
             
             # Helper to check if finger is extended
             def is_finger_extended(mcp, tip):
-                return get_dist(0, tip) > get_dist(0, mcp) * 1.15
+                return get_dist(0, tip) > get_dist(0, mcp) * 1.12
             
             # Check thumb extension
-            thumb_ext = get_dist(0, 4) > get_dist(0, 2) * 1.12
+            thumb_ext = get_dist(0, 4) > get_dist(0, 2) * 1.10
             
             index_ext = is_finger_extended(5, 8)
             middle_ext = is_finger_extended(9, 12)
@@ -194,7 +196,7 @@ class ISLSignDetector:
                 return 'PEACE'
                 
             # OK check (OK)
-            if get_dist(4, 8) < 0.045 and middle_ext and ring_ext and pinky_ext:
+            if get_dist(4, 8) < 0.05 and middle_ext and ring_ext and pinky_ext:
                 return 'OK'
                 
             # Pointing check (NO / ONE)
@@ -208,7 +210,7 @@ class ISLSignDetector:
             # Two hands checks
             if len(pts) >= 42:
                 def is_h2_extended(mcp, tip):
-                    return get_dist(21, tip) > get_dist(21, mcp) * 1.15
+                    return get_dist(21, tip) > get_dist(21, mcp) * 1.12
                 h2_index = is_h2_extended(26, 29)
                 h2_middle = is_h2_extended(30, 33)
                 h2_ring = is_h2_extended(34, 37)
@@ -218,11 +220,11 @@ class ISLSignDetector:
                 h1_open = index_ext and middle_ext and ring_ext and pinky_ext
                 
                 if (h1_open and h2_fist) or (h2_fist and h1_open):
-                    if get_dist(0, 21) < 0.18:
+                    if get_dist(0, 21) < 0.22:
                         return 'HELP'
                         
                 h2_index_ext = is_h2_extended(26, 29)
-                if index_ext and h2_index_ext and get_dist(8, 29) < 0.07:
+                if index_ext and h2_index_ext and get_dist(8, 29) < 0.09:
                     return 'HOME'
                     
             return None
@@ -231,7 +233,7 @@ class ISLSignDetector:
             return None
 
     def predict_sign(self, landmarks: np.ndarray) -> Dict:
-        # 1. First pass: Heuristic rule-based gesture engine (100% accurate for primary gestures)
+        # 1. First pass: Heuristic rule-based gesture engine
         heuristic_sign = self.heuristic_predict_sign(landmarks)
         if heuristic_sign:
             return {'success': True, 'sign': heuristic_sign, 'confidence': 0.98}
@@ -243,7 +245,6 @@ class ISLSignDetector:
         try:
             landmarks = np.array(landmarks).reshape(1, -1)
 
-            # Predict using our Random Forest classifier
             if hasattr(self.model, 'predict_proba'):
                 proba = self.model.predict_proba(landmarks)[0]
                 confidence = float(np.max(proba))
@@ -260,8 +261,8 @@ class ISLSignDetector:
     def detect_from_image(self, image_data: str) -> Dict:
         try:
             image_bytes = base64.b64decode(image_data)
-            # Apply ImageOps.exif_transpose to automatically rotate mobile pictures upright!
-            image = Image.open(BytesIO(image_bytes))
+            # Force convert('RGB') and EXIF auto-rotation
+            image = Image.open(BytesIO(image_bytes)).convert('RGB')
             image = ImageOps.exif_transpose(image)
             frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
             
@@ -287,7 +288,7 @@ class ISLSignDetector:
         except Exception as e:
             return {'success': False, 'error': str(e), 'sign': None}
 
-    def process_video_frame(self, frame: np.ndarray, min_confidence: float = 0.3) -> tuple:
+    def process_video_frame(self, frame: np.ndarray, min_confidence: float = 0.2) -> tuple:
         """Process a video frame and return (sign, confidence, face_info, annotated_frame)"""
         try:
             # Face Mesh & Expression

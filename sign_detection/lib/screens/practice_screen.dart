@@ -167,7 +167,14 @@ class _PracticeScreenState extends State<PracticeScreen> {
   Widget build(BuildContext context) {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return Scaffold(
-        appBar: AppBar(title: Text('Practice: ${widget.sign['name']}')),
+        appBar: AppBar(
+          title: Text(
+            'Practice: ${widget.sign['name']}',
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -175,8 +182,12 @@ class _PracticeScreenState extends State<PracticeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Practice: ${widget.sign['name']}'),
+        title: Text(
+          'Practice: ${widget.sign['name']}',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         centerTitle: true,
       ),
       body: Column(

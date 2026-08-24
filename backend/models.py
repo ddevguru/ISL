@@ -62,6 +62,7 @@ class Sign(db.Model):
     name = db.Column(db.String(255), nullable=False, unique=True)
     english_translation = db.Column(db.String(255), nullable=False)
     hindi_translation = db.Column(db.String(255))
+    marathi_translation = db.Column(db.String(255))
     description = db.Column(db.Text)
     video_path = db.Column(db.String(255))
     image_path = db.Column(db.String(255))
@@ -76,15 +77,23 @@ class Sign(db.Model):
     history_entries = db.relationship('UserHistory', backref='sign', lazy=True)
 
     def to_dict(self):
+        kp = self.keypoints_data
+        if isinstance(kp, str):
+            try:
+                import json
+                kp = json.loads(kp)
+            except Exception:
+                kp = []
         return {
             'id': self.id,
             'name': self.name,
             'english_translation': self.english_translation,
             'hindi_translation': self.hindi_translation,
+            'marathi_translation': self.marathi_translation,
             'description': self.description,
             'video_path': self.video_path,
             'image_path': self.image_path,
-            'keypoints_data': self.keypoints_data,
+            'keypoints_data': kp,
             'category': self.category,
             'difficulty_level': self.difficulty_level,
             'dataset_source': self.dataset_source,

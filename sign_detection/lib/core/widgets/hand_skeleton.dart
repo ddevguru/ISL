@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 class HandSkeletonPainter extends CustomPainter {
   final List<dynamic> keypoints;
@@ -32,8 +33,12 @@ class HandSkeletonPainter extends CustomPainter {
     // Convert coordinates to Offsets scaled by size
     final List<Offset> points = [];
     for (var kp in keypoints) {
-      double x = (kp['x'] ?? 0.0).toDouble();
-      double y = (kp['y'] ?? 0.0).toDouble();
+      double x = 0.5;
+      double y = 0.5;
+      if (kp is Map) {
+        x = (kp['x'] ?? 0.5).toDouble();
+        y = (kp['y'] ?? 0.5).toDouble();
+      }
       points.add(Offset(x * size.width, y * size.height));
     }
 
@@ -106,7 +111,7 @@ class HandSkeletonPainter extends CustomPainter {
 }
 
 class HandSkeletonWidget extends StatelessWidget {
-  final List<dynamic>? keypoints;
+  final dynamic keypoints;
   final double width;
   final double height;
   final Color? backgroundColor;
@@ -121,7 +126,19 @@ class HandSkeletonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (keypoints == null || keypoints!.length < 21) {
+    List<dynamic> parsedPoints = [];
+
+    if (keypoints is String && (keypoints as String).isNotEmpty) {
+      try {
+        parsedPoints = jsonDecode(keypoints as String);
+      } catch (e) {
+        parsedPoints = [];
+      }
+    } else if (keypoints is List) {
+      parsedPoints = keypoints as List;
+    }
+
+    if (parsedPoints.length < 21) {
       return Container(
         width: width,
         height: height,
@@ -145,7 +162,7 @@ class HandSkeletonWidget extends StatelessWidget {
         border: Border.all(color: Colors.deepPurple.shade100, width: 1),
       ),
       child: CustomPaint(
-        painter: HandSkeletonPainter(keypoints: keypoints!),
+        painter: HandSkeletonPainter(keypoints: parsedPoints),
       ),
     );
   }

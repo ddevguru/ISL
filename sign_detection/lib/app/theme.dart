@@ -32,14 +32,16 @@ class AppTheme {
         surface: _lightSurface,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
-        foregroundColor: _lightPrimaryDark,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
         titleTextStyle: GoogleFonts.roboto(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: _lightPrimaryDark,
+          color: Colors.white,
         ),
       ),
       cardTheme: CardThemeData(

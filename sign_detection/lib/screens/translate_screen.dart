@@ -193,8 +193,12 @@ class _TranslateScreenState extends State<TranslateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Live ISL Translation'),
+        title: const Text(
+          'Live ISL Translation',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         centerTitle: true,
       ),
       body: SingleChildScrollView(

@@ -15,7 +15,7 @@ class LearnScreen extends StatefulWidget {
 }
 
 class _LearnScreenState extends State<LearnScreen> {
-  String selectedLanguage = 'en';
+  String selectedLanguage = 'en'; // 'en', 'hi', or 'mr'
   String selectedCategory = 'ALL';
   List<Map<String, dynamic>> signs = [];
   List<String> categories = ['ALL', 'Greetings', 'Response', 'Emotions', 'Actions', 'Objects', 'Adjectives', 'Family', 'Requests', 'Time', 'Numbers'];
@@ -107,6 +107,16 @@ class _LearnScreenState extends State<LearnScreen> {
     }
   }
 
+  String _getTranslationText(Map<String, dynamic> sign) {
+    if (selectedLanguage == 'hi') {
+      return sign['hindi_translation'] ?? sign['english_translation'] ?? '';
+    } else if (selectedLanguage == 'mr') {
+      return sign['marathi_translation'] ?? sign['hindi_translation'] ?? sign['english_translation'] ?? '';
+    } else {
+      return sign['english_translation'] ?? '';
+    }
+  }
+
   void _showSignDetails(Map<String, dynamic> sign) {
     showModalBottomSheet(
       context: context,
@@ -169,11 +179,18 @@ class _LearnScreenState extends State<LearnScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(
-                selectedLanguage == 'hi'
-                    ? '🇮🇳 अनुवाद: ${sign['hindi_translation'] ?? 'N/A'}'
-                    : '🇬🇧 English: ${sign['english_translation'] ?? 'N/A'}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+              
+              // Translations display
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('🇬🇧 English: ${sign['english_translation'] ?? 'N/A'}',
+                      style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                  Text('🇮🇳 हिन्दी: ${sign['hindi_translation'] ?? 'N/A'}',
+                      style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                  Text('🚩 मराठी: ${sign['marathi_translation'] ?? 'N/A'}',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                ],
               ),
               const SizedBox(height: 16),
               
@@ -193,7 +210,7 @@ class _LearnScreenState extends State<LearnScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                sign['description'] ?? 'Position your hand as illustrated in the vector diagram.',
+                sign['description'] ?? 'Position your hand as illustrated in the vector diagram above.',
                 style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
               const SizedBox(height: 24),
@@ -241,8 +258,12 @@ class _LearnScreenState extends State<LearnScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ISL Learning Module'),
+        title: const Text(
+          'ISL Learning Module',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -304,13 +325,13 @@ class _LearnScreenState extends State<LearnScreen> {
               ),
             ),
 
-            // Language Selector Tab
+            // Language Selector Tab (English, Hindi, Marathi)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('Language: '),
+                  const Text('Language: ', style: TextStyle(fontWeight: FontWeight.w600)),
                   TextButton(
                     onPressed: () => setState(() => selectedLanguage = 'en'),
                     child: Text(
@@ -328,6 +349,16 @@ class _LearnScreenState extends State<LearnScreen> {
                       style: TextStyle(
                         fontWeight: selectedLanguage == 'hi' ? FontWeight.bold : FontWeight.normal,
                         color: selectedLanguage == 'hi' ? Colors.deepPurple : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => setState(() => selectedLanguage = 'mr'),
+                    child: Text(
+                      'मराठी 🚩',
+                      style: TextStyle(
+                        fontWeight: selectedLanguage == 'mr' ? FontWeight.bold : FontWeight.normal,
+                        color: selectedLanguage == 'mr' ? Colors.deepPurple : Colors.grey,
                       ),
                     ),
                   ),
@@ -440,9 +471,7 @@ class _LearnScreenState extends State<LearnScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    selectedLanguage == 'hi'
-                                        ? (sign['hindi_translation'] ?? '')
-                                        : (sign['english_translation'] ?? ''),
+                                    _getTranslationText(sign),
                                     style: const TextStyle(fontSize: 11, color: Colors.grey),
                                     textAlign: TextAlign.center,
                                     maxLines: 1,
