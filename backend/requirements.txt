@@ -12,3 +12,5 @@ opencv-python==4.8.0.76
 requests==2.31.0
 werkzeug>=2.3.7
 gunicorn==21.2.0
+mediapipe==0.10.35
+scikit-learn>=1.0.0
