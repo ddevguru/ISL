@@ -57,6 +57,9 @@ tmp/
 # Models and datasets
 models/*.h5
 models/*.pkl
+!models/ISL_Detection_V1.pkl
+!models/ISL_Detection_V1_encoder.pkl
+!models/ISL_Detection_V1_metadata.json
 datasets/
 
 # Logs

@@ -15,6 +15,13 @@ from sklearn.model_selection import train_test_split
 
 # Add path so python can import app modules if run directly
 import sys
+import io
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from dataset_loader import DatasetLoader

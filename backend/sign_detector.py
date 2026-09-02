@@ -4,16 +4,26 @@ import numpy as np
 import mediapipe as mp
 import pickle
 import json
+import sys
+import io
 from pathlib import Path
 from typing import Dict, Optional
 import base64
 from io import BytesIO
 from PIL import Image, ImageOps
 
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 class ISLSignDetector:
     def __init__(self, model_name="ISL_Detection_V1"):
         self.model_name = model_name
         self.models_dir = Path('models')
+        self.models_dir.mkdir(exist_ok=True)
         
         self.mp_hands = mp.solutions.hands
         # static_image_mode=True is required for still frame API processing!
@@ -44,6 +54,14 @@ class ISLSignDetector:
         metadata_path = self.models_dir / f"{self.model_name}_metadata.json"
 
         try:
+            if not model_path_sk.exists() or not encoder_path.exists():
+                print(f"⚠️ Model file missing ({model_path_sk}). Training model now...")
+                try:
+                    from train_sign_detection_model import main as train_model_main
+                    train_model_main()
+                except Exception as te:
+                    print(f"❌ Auto-training model failed: {te}")
+
             if model_path_sk.exists():
                 with open(model_path_sk, 'rb') as f:
                     self.model = pickle.load(f)

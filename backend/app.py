@@ -12,6 +12,14 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 from models import db, Sign
 from auth import auth_bp
 from detection_routes import detection_bp
@@ -134,35 +142,21 @@ def create_app(config_name='development'):
         except Exception as e:
             print(f"Migration error: {e}")
 
-    def _load_sample_signs():
-        """Load sample ISL signs into database"""
+    def _load_dataset_signs():
+        """Load full ISL sign language dataset into database with keypoints and translations"""
         try:
-            if Sign.query.first() is None:
-                signs_data = [
-                    {'name': 'HELLO', 'english_translation': 'Hello', 'hindi_translation': 'नमस्ते', 'category': 'Greetings', 'difficulty_level': 'Easy', 'description': 'Wave your hand near your face'},
-                    {'name': 'THANK_YOU', 'english_translation': 'Thank You', 'hindi_translation': 'धन्यवाद', 'category': 'Greetings', 'difficulty_level': 'Easy', 'description': 'Bring hand to mouth, then extend outward'},
-                    {'name': 'YES', 'english_translation': 'Yes', 'hindi_translation': 'हाँ', 'category': 'Common Words', 'difficulty_level': 'Easy', 'description': 'Nod with thumb up'},
-                    {'name': 'NO', 'english_translation': 'No', 'hindi_translation': 'नहीं', 'category': 'Common Words', 'difficulty_level': 'Easy', 'description': 'Cross hands in front of body'},
-                    {'name': 'HOME', 'english_translation': 'Home', 'hindi_translation': 'घर', 'category': 'Places', 'difficulty_level': 'Easy', 'description': 'Form roof shape with both hands'},
-                    {'name': 'GOOD', 'english_translation': 'Good', 'hindi_translation': 'अच्छा', 'category': 'Adjectives', 'difficulty_level': 'Easy', 'description': 'Thumbs up gesture'},
-                    {'name': 'BAD', 'english_translation': 'Bad', 'hindi_translation': 'बुरा', 'category': 'Adjectives', 'difficulty_level': 'Easy', 'description': 'Thumbs down gesture'},
-                    {'name': 'HELP', 'english_translation': 'Help', 'hindi_translation': 'मदद', 'category': 'Verbs', 'difficulty_level': 'Medium', 'description': 'Fist on palm gesture'},
-                    {'name': 'LOVE', 'english_translation': 'Love', 'hindi_translation': 'प्यार', 'category': 'Emotions', 'difficulty_level': 'Medium', 'description': 'Cross hands over heart'},
-                    {'name': 'FRIEND', 'english_translation': 'Friend', 'hindi_translation': 'दोस्त', 'category': 'People', 'difficulty_level': 'Medium', 'description': 'Hook two fingers together'},
-                ]
-                for sign_data in signs_data:
-                    sign = Sign(**sign_data)
-                    db.session.add(sign)
-                db.session.commit()
-                print("✅ Sample signs loaded!")
+            from dataset_loader import DatasetLoader
+            loader = DatasetLoader()
+            count, message = loader.insert_signs_into_db()
+            print(f"✅ Full ISL dataset verified: {count} signs loaded/updated ({message})")
         except Exception as e:
-            print(f"Error loading signs: {e}")
+            print(f"Error loading full ISL dataset: {e}")
             db.session.rollback()
 
     with app.app_context():
         db.create_all()
         _run_migrations()
-        _load_sample_signs()
+        _load_dataset_signs()
 
     return app
 

@@ -18,10 +18,6 @@ def _get_production_db_url():
     if '?' in db_url:
         db_url = db_url.split('?')[0]
 
-    # Add lenient SSL mode
-    if db_url.startswith('postgresql://'):
-        db_url += '?sslmode=allow'
-
     return db_url
 
 

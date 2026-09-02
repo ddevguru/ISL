@@ -91,12 +91,22 @@ def create_admin_user():
             db.session.rollback()
             print(f"✗ Error creating admin user: {str(e)}")
 
+import sys
+import io
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 if __name__ == '__main__':
     init_database()
 
     try:
-        response = input("\nWould you like to create an admin user? (y/n): ").strip().lower()
-        if response == 'y':
-            create_admin_user()
-    except KeyboardInterrupt:
-        print("\n\nInitialization cancelled by user")
+        if sys.stdin and sys.stdin.isatty():
+            response = input("\nWould you like to create an admin user? (y/n): ").strip().lower()
+            if response == 'y':
+                create_admin_user()
+    except (KeyboardInterrupt, EOFError):
+        print("\nNon-interactive session: Skipping admin user creation.")
