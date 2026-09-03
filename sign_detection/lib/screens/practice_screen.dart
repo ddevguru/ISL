@@ -99,7 +99,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
           'min_confidence': 0.4,
           'target_sign': widget.sign['name']
         }),
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -135,6 +135,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
           }
         }
       }
+    } on TimeoutException {
+      print('Practice frame timeout (skipped frame)');
     } catch (e) {
       print('Practice validation error: $e');
     }

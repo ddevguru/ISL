@@ -12,6 +12,12 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+except Exception:
+    pass
+
 import sys
 if hasattr(sys.stdout, 'reconfigure'):
     try:

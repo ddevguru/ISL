@@ -13,7 +13,7 @@ from io import BytesIO
 
 detection_bp = Blueprint('detection', __name__, url_prefix='/api/detection')
 
-video_processor = VideoProcessor()
+video_processor = VideoProcessor(eager_init=True)
 
 @detection_bp.route('/signs', methods=['GET'])
 def get_all_signs():

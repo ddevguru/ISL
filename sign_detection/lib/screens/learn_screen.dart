@@ -45,7 +45,7 @@ class _LearnScreenState extends State<LearnScreen> {
         final catsList = data['categories'] as List?;
         if (catsList != null && catsList.isNotEmpty) {
           setState(() {
-            categories = ['ALL', ...List<String>.from(catsList)];
+            categories = ['ALL', ...catsList.map((e) => e.toString())];
           });
         }
       }

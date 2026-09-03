@@ -6,10 +6,15 @@ import os
 from datetime import datetime
 
 class VideoProcessor:
-    def __init__(self):
+    def __init__(self, eager_init=False):
         self.detector = None
         self.frame_buffer = []
         self.detections = []
+        if eager_init:
+            try:
+                self._get_detector()
+            except Exception as e:
+                print(f"⚠️ Eager detector pre-initialization notice: {e}")
 
     def _get_detector(self):
         """Lazy initialization of detector"""

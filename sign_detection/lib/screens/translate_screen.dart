@@ -102,7 +102,7 @@ class _TranslateScreenState extends State<TranslateScreen> {
           'frame': base64Image,
           'min_confidence': 0.2
         }),
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -137,6 +137,8 @@ class _TranslateScreenState extends State<TranslateScreen> {
           });
         }
       }
+    } on TimeoutException {
+      print('Frame detection timeout (skipped frame)');
     } catch (e) {
       print('Detection request error: $e');
     }

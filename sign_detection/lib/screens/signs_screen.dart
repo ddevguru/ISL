@@ -59,9 +59,9 @@ class _SignsScreenState extends State<SignsScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final rawCats = data['categories'] as List? ?? [];
         setState(() {
-          categories = ['All'];
-          categories.addAll(List<String>.from(data['categories'] ?? []));
+          categories = ['All', ...rawCats.map((e) => e.toString())];
         });
       }
     } catch (e) {

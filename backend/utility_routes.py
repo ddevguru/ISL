@@ -221,7 +221,7 @@ def get_categories():
     try:
         categories = db.session.query(Sign.category).distinct().all()
         return jsonify({
-            'categories': [cat[0] for cat in categories if cat[0]]
+            'categories': [str(cat[0]) for cat in categories if cat[0] is not None]
         }), 200
     except Exception as e:
         return jsonify({'error': f'Failed to fetch categories: {str(e)}'}), 500
