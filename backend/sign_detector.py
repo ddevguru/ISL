@@ -19,28 +19,78 @@ if hasattr(sys.stdout, 'reconfigure'):
     except Exception:
         pass
 
+class UniversalMediaPipeEngine:
+    def __init__(self, models_dir: Path):
+        self.mode = None
+        self.models_dir = models_dir
+
+        # Strategy 1: Try legacy mp.solutions
+        try:
+            if hasattr(mp, 'solutions'):
+                self.mp_hands = mp.solutions.hands
+                self.hands = self.mp_hands.Hands(
+                    static_image_mode=True, max_num_hands=2, min_detection_confidence=0.2
+                )
+                self.mp_face_mesh = mp.solutions.face_mesh
+                self.face_mesh = self.mp_face_mesh.FaceMesh(
+                    static_image_mode=True, max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.2
+                )
+                self.mode = 'solutions'
+                print("✅ MediaPipe Engine: initialized with legacy solutions API")
+                return
+        except Exception as e:
+            print(f"Notice: mp.solutions unavailable ({e}). Trying Tasks API...")
+
+        # Strategy 2: Try MediaPipe Tasks API (Python 3.12+)
+        try:
+            from mediapipe.tasks import python as mp_tasks
+            from mediapipe.tasks.python import vision
+            import urllib.request
+
+            hand_task_path = models_dir / 'hand_landmarker.task'
+            if not hand_task_path.exists():
+                print("⏬ Downloading hand_landmarker.task...")
+                urllib.request.urlretrieve(
+                    'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                    str(hand_task_path)
+                )
+
+            face_task_path = models_dir / 'face_landmarker.task'
+            if not face_task_path.exists():
+                print("⏬ Downloading face_landmarker.task...")
+                urllib.request.urlretrieve(
+                    'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+                    str(face_task_path)
+                )
+
+            hand_options = vision.HandLandmarkerOptions(
+                base_options=mp_tasks.BaseOptions(model_asset_path=str(hand_task_path)),
+                num_hands=2,
+                min_hand_detection_confidence=0.2
+            )
+            self.hand_landmarker = vision.HandLandmarker.create_from_options(hand_options)
+
+            face_options = vision.FaceLandmarkerOptions(
+                base_options=mp_tasks.BaseOptions(model_asset_path=str(face_task_path)),
+                num_faces=1,
+                min_face_detection_confidence=0.2
+            )
+            self.face_landmarker = vision.FaceLandmarker.create_from_options(face_options)
+            self.mp_image_class = mp.Image
+            self.mp_image_format = mp.ImageFormat
+            self.mode = 'tasks'
+            print("✅ MediaPipe Engine: initialized with Tasks API")
+        except Exception as te:
+            print(f"⚠️ Tasks API initialization notice: {te}")
+            self.mode = 'none'
+
 class ISLSignDetector:
     def __init__(self, model_name="ISL_Detection_V1"):
         self.model_name = model_name
         self.models_dir = Path('models')
         self.models_dir.mkdir(exist_ok=True)
         
-        self.mp_hands = mp.solutions.hands
-        # static_image_mode=True is required for still frame API processing!
-        self.hands = self.mp_hands.Hands(
-            static_image_mode=True,
-            max_num_hands=2,
-            min_detection_confidence=0.2
-        )
-        
-        self.mp_face_mesh = mp.solutions.face_mesh
-        # static_image_mode=True is required for still frame API processing!
-        self.face_mesh = self.mp_face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.2
-        )
+        self.engine = UniversalMediaPipeEngine(self.models_dir)
         
         self.model = None
         self.label_encoder = None
@@ -83,27 +133,51 @@ class ISLSignDetector:
 
     def extract_landmarks(self, frame: np.ndarray) -> Optional[np.ndarray]:
         try:
-            results = self.hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            if results.multi_hand_landmarks:
-                landmarks = []
-                for hand_landmarks in results.multi_hand_landmarks:
-                    for landmark in hand_landmarks.landmark:
-                        landmarks.extend([landmark.x, landmark.y])
-                if len(landmarks) == self.landmarks_size:
-                    landmarks.extend([0] * self.landmarks_size)
-                return np.array(landmarks[:self.landmarks_size * 2])
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            if self.engine.mode == 'solutions':
+                results = self.engine.hands.process(rgb_frame)
+                if results.multi_hand_landmarks:
+                    landmarks = []
+                    for hand_landmarks in results.multi_hand_landmarks:
+                        for landmark in hand_landmarks.landmark:
+                            landmarks.extend([landmark.x, landmark.y])
+                    if len(landmarks) == self.landmarks_size:
+                        landmarks.extend([0] * self.landmarks_size)
+                    return np.array(landmarks[:self.landmarks_size * 2])
+                return None
+            elif self.engine.mode == 'tasks':
+                mp_img = self.engine.mp_image_class(image_format=self.engine.mp_image_format.SRGB, data=rgb_frame)
+                result = self.engine.hand_landmarker.detect(mp_img)
+                if result.hand_landmarks:
+                    landmarks = []
+                    for hand_landmarks in result.hand_landmarks:
+                        for landmark in hand_landmarks:
+                            landmarks.extend([landmark.x, landmark.y])
+                    if len(landmarks) == self.landmarks_size:
+                        landmarks.extend([0] * self.landmarks_size)
+                    return np.array(landmarks[:self.landmarks_size * 2])
+                return None
             return None
         except Exception as e:
             print(f"❌ Error extracting landmarks: {e}")
             return None
 
     def process_face(self, frame: np.ndarray) -> Dict:
-        """Detect face and analyze expressions and facial patterns using Face Mesh"""
+        """Detect face and analyze expressions and facial patterns using Face Mesh / Tasks"""
         try:
-            results = self.face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            if results.multi_face_landmarks:
-                landmarks = results.multi_face_landmarks[0].landmark
-                
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            landmarks = None
+            if self.engine.mode == 'solutions':
+                results = self.engine.face_mesh.process(rgb_frame)
+                if results.multi_face_landmarks:
+                    landmarks = results.multi_face_landmarks[0].landmark
+            elif self.engine.mode == 'tasks':
+                mp_img = self.engine.mp_image_class(image_format=self.engine.mp_image_format.SRGB, data=rgb_frame)
+                result = self.engine.face_landmarker.detect(mp_img)
+                if result.face_landmarks and len(result.face_landmarks) > 0:
+                    landmarks = result.face_landmarks[0]
+            
+            if landmarks:
                 # Calculate face bounding box in normalized coordinates
                 x_coords = [lm.x for lm in landmarks]
                 y_coords = [lm.y for lm in landmarks]
@@ -119,7 +193,9 @@ class ISLSignDetector:
                 
                 # 3D distance helper
                 def get_dist_3d(p1, p2):
-                    return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2 + (p1.z - p2.z)**2)
+                    p1_z = getattr(p1, 'z', 0.0)
+                    p2_z = getattr(p2, 'z', 0.0)
+                    return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2 + (p1_z - p2_z)**2)
                 
                 # Normalize distances by cheek-to-cheek face width
                 face_width = get_dist_3d(landmarks[234], landmarks[454]) or 1.0

@@ -13,5 +13,6 @@ Pillow>=9.0.0
 requests==2.31.0
 werkzeug>=2.3.7
 gunicorn==21.2.0
-mediapipe==0.10.35
+mediapipe==0.10.14
+protobuf>=3.20.3,<4.26.0
 scikit-learn>=1.0.0
