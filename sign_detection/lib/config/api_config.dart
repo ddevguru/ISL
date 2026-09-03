@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class ApiConfig {
   static String? authToken;
 
-  static String _baseUrl = 'http://localhost:5000/api';
+  static String _baseUrl = 'https://isl-u2qo.onrender.com/api';
 
   static String get baseUrl => _baseUrl;
 
